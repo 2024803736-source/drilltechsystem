@@ -5,7 +5,37 @@ if(!isset($_SESSION['username'])){
     exit();
 }
 include("database.php"); // sambung database
-$result = mysqli_query($conn, "SELECT * FROM employee");
+
+// Cari Employee_ID berdasarkan username login
+$employeeName = $_SESSION['username'];
+$empQuery = mysqli_query($conn, "SELECT Employee_ID FROM employee WHERE Employee_Name='$employeeName'");
+$empRow = mysqli_fetch_assoc($empQuery);
+$employeeID = $empRow['Employee_ID'];
+
+// Active Projects untuk employee login
+$activeProjects = mysqli_query($conn, "
+    SELECT p.Project_Name, p.Project_Status 
+    FROM project p
+    JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
+    WHERE ae.Employee_ID = '$employeeID' AND p.Project_Status='On Going'
+");
+
+// Completed Projects untuk employee login
+$completedProjects = mysqli_query($conn, "
+    SELECT p.Project_Name 
+    FROM project p
+    JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
+    WHERE ae.Employee_ID = '$employeeID' AND p.Project_Status='Completed'
+");
+
+// Recent Updates projek yang employee login terlibat
+$recentUpdates = mysqli_query($conn, "
+    SELECT p.Project_Name, p.Project_Status 
+    FROM project p
+    JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
+    WHERE ae.Employee_ID = '$employeeID'
+    ORDER BY p.Project_ID DESC LIMIT 5
+");
 ?>
 <!DOCTYPE html>
 <html>
@@ -66,19 +96,32 @@ $result = mysqli_query($conn, "SELECT * FROM employee");
     <a href="payrollEM.php">Payroll</a>
 </div>
 
-
     <div class="content">
         <div class="card">
             <h2>Active Projects</h2>
-            
+            <ul>
+                <?php while($row = mysqli_fetch_assoc($activeProjects)) { ?>
+                    <li><?php echo $row['Project_Name']; ?></li>
+                <?php } ?>
+            </ul>
         </div>
+
         <div class="card">
             <h2>Completed Projects</h2>
-            
+            <ul>
+                <?php while($row = mysqli_fetch_assoc($completedProjects)) { ?>
+                    <li><?php echo $row['Project_Name']; ?></li>
+                <?php } ?>
+            </ul>
         </div>
+
         <div class="card">
             <h2>Recent Updates</h2>
-            
+            <ul>
+                <?php while($row = mysqli_fetch_assoc($recentUpdates)) { ?>
+                    <li><?php echo $row['Project_Name']; ?></li>
+                <?php } ?>
+            </ul>
         </div>
     </div>
 </body>

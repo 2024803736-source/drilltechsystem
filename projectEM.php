@@ -4,6 +4,18 @@ if(!isset($_SESSION['username'])){
     header("Location: loginEM.php");
     exit();
 }
+include("database.php");
+
+// Ambil Employee_ID dari session
+$employeeID = $_SESSION['employee_id'];
+
+// Query projek yang employee tu commit
+$projects = mysqli_query($conn, "
+    SELECT p.Project_ID, p.Project_Name, p.Project_Status, ae.ProjectEmp_EndD
+    FROM project p
+    JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
+    WHERE ae.Employee_ID = '$employeeID'
+");
 ?>
 <!DOCTYPE html>
 <html>
@@ -85,19 +97,14 @@ if(!isset($_SESSION['username'])){
                     <th>Status</th>
                     <th>Due Date</th>
                 </tr>
-                <!-- baris kosong -->
+                <?php while($row = mysqli_fetch_assoc($projects)) { ?>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td><?php echo $row['Project_ID']; ?></td>
+                    <td><?php echo $row['Project_Name']; ?></td>
+                    <td><?php echo $row['Project_Status']; ?></td>
+                    <td><?php echo !empty($row['ProjectEmp_EndD']) ? $row['ProjectEmp_EndD'] : 'N/A'; ?></td>
                 </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
+                <?php } ?>
             </table>
         </div>
     </div>
