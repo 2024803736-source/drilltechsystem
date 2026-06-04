@@ -53,9 +53,6 @@ if(!isset($_SESSION['client_name'])){
                 <tr>
                     <th>Project ID</th><th>Project Name</th><th>Status</th><th>Value</th><th>Deadline</th>
                 </tr>
-                <tr><td>A01</td><td>Site Alpha</td><td>On Going</td><td>RM80,000</td><td>15/06/2026</td></tr>
-                <tr><td>A02</td><td>Pipeline Delta</td><td>On Going</td><td>RM80,000</td><td>01/07/2026</td></tr>
-                <tr><td>A03</td><td>River Crossing Beta</td><td>Completed</td><td>RM80,000</td><td>20/08/2026</td></tr>
             </table>
             <div class="buttons">
                 <button class="btn btn-blue">Add Project (+)</button>
