@@ -4,6 +4,13 @@ if(!isset($_SESSION['username'])){
     header("Location: loginEM.php");
     exit();
 }
+include("database.php");
+
+$employeeID = $_SESSION['employee_id'];
+
+// Ambil data employee dari DB
+$result = mysqli_query($conn, "SELECT * FROM employee WHERE Employee_ID='$employeeID'");
+$row = mysqli_fetch_assoc($result);
 ?>
 <!DOCTYPE html>
 <html>
@@ -89,16 +96,15 @@ if(!isset($_SESSION['username'])){
     <div class="content">
         <div class="profile-card">
             <h2>Personal Details</h2>
-            <p><strong>Name:</strong> </p>
-            <p><strong>Contact:</strong> </p>
-            <p><strong>Gender:</strong> </p>
-            <p><strong>Position:</strong> </p>
-            <p><strong>Address:</strong> </p>
+            <p><strong>Name:</strong> <?php echo $row['Employee_Name']; ?></p>
+            <p><strong>Contact:</strong> <?php echo $row['Employee_Contact']; ?></p>
+            <p><strong>Gender:</strong> <?php echo $row['Employee_Gender']; ?></p>
+            <p><strong>Position:</strong> <?php echo $row['Employee_Position']; ?></p>
+            <p><strong>Address:</strong> <?php echo $row['Employee_Address']; ?></p>
         </div>
 
         <div class="button-container">
-            <button class="btn update-btn">Update Info</button>
-            <button class="btn edit-btn">Edit Personal Details</button>
+            <button class="btn edit-btn" onclick="window.location.href='editProfileEM.php'">Edit Personal Details</button>
         </div>
     </div>
 </body>
