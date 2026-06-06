@@ -38,7 +38,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <title>Edit Profile</title>
     <style>
         body {
-            background-image: url('construction_bg.jpg');
+            background-image: url('images/construction_bg.jpg');
             background-size: cover;
             font-family: Arial, sans-serif;
             color: white;

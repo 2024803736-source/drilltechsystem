@@ -18,7 +18,7 @@ $row = mysqli_fetch_assoc($result);
     <title>Profile Dashboard</title>
     <style>
         body {
-            background-image: url('construction_bg.jpg');
+            background-image: url('images/construction_bg.jpg');
             background-size: cover;
             font-family: Arial, sans-serif;
             color: white;
@@ -95,13 +95,22 @@ $row = mysqli_fetch_assoc($result);
 
     <div class="content">
         <div class="profile-card">
-            <h2>Personal Details</h2>
-            <p><strong>Name:</strong> <?php echo $row['Employee_Name']; ?></p>
-            <p><strong>Contact:</strong> <?php echo $row['Employee_Contact']; ?></p>
-            <p><strong>Gender:</strong> <?php echo $row['Employee_Gender']; ?></p>
-            <p><strong>Position:</strong> <?php echo $row['Employee_Position']; ?></p>
-            <p><strong>Address:</strong> <?php echo $row['Employee_Address']; ?></p>
-        </div>
+    <h2>Personal Details</h2>
+    
+    <!-- Slot gambar profile -->
+    <div style="text-align:center; margin-bottom:15px;">
+        <img src="images/gambar/<?php echo $employeeID; ?>.jpg" 
+             alt="Profile Picture" 
+             style="width:200px;height:200px;border-radius:50%;border:5px solid #006400;">
+    </div>
+
+    <p><strong>Name:</strong> <?php echo $row['Employee_Name']; ?></p>
+    <p><strong>Contact:</strong> <?php echo $row['Employee_Contact']; ?></p>
+    <p><strong>Gender:</strong> <?php echo $row['Employee_Gender']; ?></p>
+    <p><strong>Position:</strong> <?php echo $row['Employee_Position']; ?></p>
+    <p><strong>Address:</strong> <?php echo $row['Employee_Address']; ?></p>
+</div>
+
 
         <div class="button-container">
             <button class="btn edit-btn" onclick="window.location.href='editProfileEM.php'">Edit Personal Details</button>

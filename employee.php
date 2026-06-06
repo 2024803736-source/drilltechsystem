@@ -43,7 +43,7 @@ $recentUpdates = mysqli_query($conn, "
     <title>Employee Dashboard</title>
     <style>
         body {
-            background-image: url('construction_bg.jpg');
+            background-image: url('images/construction_bg.jpg');
             background-size: cover;
             font-family: Arial, sans-serif;
             color: white;
@@ -87,7 +87,7 @@ $recentUpdates = mysqli_query($conn, "
     </style>
 </head>
 <body>
-    <div class="header">Welcome, <?php echo $_SESSION['username']; ?></div>
+    <div class="header">Welcome, Employee <?php echo $_SESSION['username']; ?></div>
 
 <div class="sidebar">
     <a href="employee.php">Dashboard</a>
