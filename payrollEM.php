@@ -4,6 +4,12 @@ if(!isset($_SESSION['username'])){
     header("Location: loginEM.php");
     exit();
 }
+include("database.php");
+
+$employeeID = $_SESSION['employee_id'];
+
+// Ambil payroll untuk employee login
+$result = mysqli_query($conn, "SELECT * FROM payroll WHERE Employee_ID='$employeeID'");
 ?>
 <!DOCTYPE html>
 <html>
@@ -86,21 +92,15 @@ if(!isset($_SESSION['username'])){
                     <th>Payroll Amount</th>
                     <th>Payroll Status</th>
                 </tr>
-                <!-- baris kosong -->
+                <?php while($row = mysqli_fetch_assoc($result)) { ?>
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td><?php echo $row['Payroll_ID']; ?></td>
+                    <td><?php echo $row['Employee_ID']; ?></td>
+                    <td><?php echo $row['Payroll_Date']; ?></td>
+                    <td><?php echo $row['Payroll_Amount']; ?></td>
+                    <td><?php echo $row['Payroll_Status']; ?></td>
                 </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
+                <?php } ?>
             </table>
         </div>
     </div>
