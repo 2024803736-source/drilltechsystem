@@ -171,11 +171,11 @@ $projects = mysqli_query($conn, "
             </table>
 
             <!-- Centered Button -->
-            <div class="button-container">
-                <button class="add-project" onclick="alert('Add New Project feature coming soon!')">
-                    Add Project (+)
-                </button>
-            </div>
+         <div class="button-container">
+         <a href="addProjectCL.php">
+        <button class="add-project">Add Project (+)</button>
+         </a>
+         </div>
         </div>
     </div>
 </body>

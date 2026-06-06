@@ -10,7 +10,7 @@ if(!isset($_SESSION['client_id'])){
 $client_id = $_SESSION['client_id'];
 $client_name = $_SESSION['client_name'];
 
-// Fetch payments
+// Fetch all payments
 $payments = mysqli_query($conn, "
     SELECT p.*, pr.Project_Name, pr.Project_ID as ProjID 
     FROM payment p 
@@ -101,45 +101,30 @@ $payments = mysqli_query($conn, "
             border-radius: 20px;
             font-weight: bold;
         }
-
-        /* Buttons */
-        .action-buttons {
-            text-align: center;
-            margin-top: 35px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
         .btn {
-            padding: 14px 28px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 30px;
+            font-size: 14px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-        .btn-make {
-            background: linear-gradient(135deg, #007bff, #00aaff);
-            color: white;
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
-        }
-        .btn-make:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
+            text-decoration: none;
+            display: inline-block;
         }
         .btn-download {
             background: linear-gradient(135deg, #28a745, #34d058);
             color: white;
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
         }
-        .btn-download:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.5);
+        .action-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn-make {
+            background: linear-gradient(135deg, #007bff, #00aaff);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -165,14 +150,17 @@ $payments = mysqli_query($conn, "
                 <tr>
                     <th>Payment ID</th>
                     <th>Project ID</th>
-                    <th>Payment Status</th>
+                    <th>Project Name</th>
+                    <th>Status</th>
                     <th>Date</th>
-                    <th>Payment Method</th>
+                    <th>Method</th>
+                    <th>Action</th>
                 </tr>
                 <?php while($row = mysqli_fetch_assoc($payments)): ?>
                 <tr>
                     <td><?php echo $row['Payment_ID']; ?></td>
                     <td><?php echo $row['ProjID']; ?></td>
+                    <td><?php echo htmlspecialchars($row['Project_Name']); ?></td>
                     <td>
                         <?php if($row['Payment_Status'] == 'Completed'): ?>
                             <span class="status-completed">Completed</span>
@@ -182,18 +170,20 @@ $payments = mysqli_query($conn, "
                     </td>
                     <td><?php echo $row['Payment_Date']; ?></td>
                     <td><?php echo htmlspecialchars($row['Payment_Method']); ?></td>
+                    <td>
+                        <a href="downloadReceipt.php?payment_id=<?php echo $row['Payment_ID']; ?>" class="btn btn-download">
+                            📥 Receipt
+                        </a>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </table>
 
-            <!-- Action Buttons -->
+            <!-- Make Payment Button -->
             <div class="action-buttons">
-                <button class="btn btn-make" onclick="alert('Make Payment feature coming soon!')">
-                    💳 Make Payment
-                </button>
-                <button class="btn btn-download" onclick="alert('Download Receipt feature coming soon!')">
-                    📥 Download Receipt
-                </button>
+                <a href="makePaymentCL.php">
+                    <button class="btn btn-make">💳 Make New Payment</button>
+                </a>
             </div>
         </div>
     </div>
