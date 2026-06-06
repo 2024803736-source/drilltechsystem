@@ -48,13 +48,42 @@ if(!$row){
             background: white;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
-        .header { text-align: center; border-bottom: 4px solid #003087; padding-bottom: 20px; margin-bottom: 30px; }
-        .logo { font-size: 36px; color: #003087; margin-bottom: 5px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #003087; color: white; }
-        .total { font-size: 22px; font-weight: bold; text-align: right; margin-top: 30px; color: #003087; }
-        .footer { text-align: center; margin-top: 50px; color: #666; font-size: 14px; }
+        .header {
+             text-align: center; 
+             border-bottom: 4px solid #003087; 
+             padding-bottom: 20px; 
+             margin-bottom: 30px;
+             }
+        .logo { 
+            font-size: 36px;
+            color: #003087; 
+            margin-bottom: 5px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; }
+        th, td {
+             padding: 12px 15px; 
+             text-align: left; 
+             border-bottom: 1px solid #ddd;
+             }
+        th { 
+            background: #003087; 
+            color: white; 
+        }
+        .total { 
+            font-size: 22px; 
+            font-weight: bold; 
+            text-align: right;
+             margin-top: 30px; 
+             color: #003087;
+             }
+        .footer { text-align: center;
+         margin-top: 50px; 
+         color: #666; 
+         font-size: 14px;
+         }
         .print-btn { 
             padding: 12px 30px; 
             background: #28a745; 

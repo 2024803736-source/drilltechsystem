@@ -36,7 +36,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             font-family: Arial, sans-serif;
             height: 100vh;
             background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), 
-                        url('ss1.jpg') center/cover no-repeat fixed;
+                        url('backgroundCSC264.png') center/cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
