@@ -37,7 +37,7 @@ if(!$row){
         body { 
             font-family: Arial, sans-serif; 
             margin: 30px; 
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('backgroundCSC264.png') center/cover no-repeat fixed;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('images/construction_bg.jpg') center/cover no-repeat fixed;
             color: #333;
         }
         .receipt { 
