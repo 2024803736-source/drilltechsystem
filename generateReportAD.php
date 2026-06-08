@@ -29,65 +29,71 @@ $equipments = mysqli_query($conn, "SELECT eq.Equipment_Name, eu.Equipment_Durati
     <meta charset="UTF-8">
     <title>Project Report</title>
     <style>
-        body { 
-            font-family:Arial,sans-serif; 
-            background:#f0f0f0; 
-            color:#222; 
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), 
+                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+            color: black;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .top-bar {
+            background:#4a4a4a;
+            padding:12px 30px;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+        .top-bar span {
+            color:white;
+            font-size:16px;
+            font-weight:bold;
+        }
+        .top-bar button {
+            padding:8px 20px;
+            background:#888;
+            color:white;
+            border:none;
+            border-radius:5px;
+            font-size:14px;
+            cursor:pointer;
+            margin-left:10px;
+        }
+        .top-bar button:hover {
+            background:#555;
+        }
+        .report {
+            max-width:800px;
+            margin:30px auto;
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            box-shadow:0 4px 15px rgba(0,0,0,0.15);
+        }
+        h1 {
+            font-size:24px;
+            margin-bottom:10px;
+        }
+        h2 {
+            font-size:18px;
+            margin:20px 0 10px;
+            background:#ddd;
+            padding:8px;
+            border-radius:5px;
+        }
+        p, li {
+            font-size:14px;
+            margin:5px 0;
+        }
+        ul {
             margin:0;
-         }
-        .top-bar { 
-            background:#4a4a4a; 
-            padding:12px 30px; 
-            display:flex; a
-            lign-items:center; 
-            justify-content:space-between; 
+            padding-left:20px;
         }
-        .top-bar span { 
-            color:white; 
-            font-size:16px; 
-            font-weight:bold; 
-        }
-        .top-bar button { 
-            padding:8px 20px; 
-            background:#888; 
-            color:white; 
-            border:none; 
-            border-radius:5px; 
-            font-size:14px; 
-            cursor:pointer; 
-        }
-        .top-bar button:hover { 
-            background:#555; 
-        }
-        .report { 
-            max-width:800px; 
-            margin:30px auto; 
-            background:white; 
-            padding:30px; border-radius:10px; 
-            box-shadow:0 4px 15px rgba(0,0,0,0.15); }
-        h1 { 
-            font-size:24px; 
-            margin-bottom:10px; 
-        }
-        h2 { 
-            font-size:18px; 
-            margin:20px 0 10px; 
-            background:#ddd; 
-            padding:8px; 
-            border-radius:5px; 
-        }
-        p, li { 
-            font-size:14px; 
-            margin:5px 0; 
-        }
-        ul { 
-            margin:0; 
-            padding-left:20px; }
-        .footer { 
-            margin-top:30px; 
-            font-size:12px; 
-            color:#555; t
-            ext-align:center; 
+        .footer {
+            margin-top:30px;
+            font-size:12px;
+            color:#555;
+            text-align:center;
         }
     </style>
 </head>
@@ -95,7 +101,10 @@ $equipments = mysqli_query($conn, "SELECT eq.Equipment_Name, eu.Equipment_Durati
 
 <div class="top-bar">
     <span>🔧 DRILLTECH — Project Report</span>
-    <button onclick="window.close()">✕ Close</button>
+    <div>
+        <button onclick="window.print()">🖨 Print</button>
+        <button onclick="window.close()">✕ Close</button>
+    </div>
 </div>
 
 <div class="report">
@@ -151,8 +160,12 @@ $equipments = mysqli_query($conn, "SELECT eq.Equipment_Name, eu.Equipment_Durati
     <p>Approved by: Manager</p>
 
     <div class="footer">
-        DRILLTECH | Generated on <?php echo date("d M Y, h:i A"); ?>
-    </div>
+    DRILLTECH | Generated on <?php 
+        date_default_timezone_set('Asia/Kuala_Lumpur'); 
+        echo date("d M Y, h:i A"); 
+    ?>
+</div>
+
 </div>
 
 </body>

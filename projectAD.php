@@ -20,9 +20,10 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Arial, sans-serif;
-            background: #f0f0f0;
-            color: #222;
-        }
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('images/construction_bg.jpg') center/cover no-repeat fixed;
+            color: black;
+            min-height: 100vh;
+}
 
         /* ===== HEADER ===== */
         .header {
