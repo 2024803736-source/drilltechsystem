@@ -1,16 +1,19 @@
 <?php
-session_start();
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
 if(!isset($_SESSION['admin_id'])){
     header("Location: loginAD.php");
     exit();
 }
 include("database.php");
 
+$admin_name = $_SESSION['admin_name'] ?? 'Admin';
+
 // Kalau form disubmit
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $projectID = $_POST['project_id'];
 
-    // Simpan assignment employee
     $engineer = $_POST['engineer'];
     $supervisor = $_POST['supervisor'];
     $workers = isset($_POST['workers']) ? $_POST['workers'] : [];
@@ -25,7 +28,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         mysqli_query($conn, "INSERT INTO assigned_employee (Project_ID, Employee_ID) VALUES ('$projectID','$w')");
     }
 
-    // Simpan equipment usage
     if(isset($_POST['duration'])){
         foreach($_POST['duration'] as $eqID => $dur){
             if(!empty($dur)){
@@ -34,10 +36,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 
-    // Update status projek → On Going
     mysqli_query($conn, "UPDATE project SET Project_Status='On Going' WHERE Project_ID='$projectID'");
 
-    // Redirect balik ke projectAD.php
     header("Location: projectAD.php");
     exit();
 }
@@ -49,97 +49,270 @@ $result = mysqli_query($conn, $query);
 $project = mysqli_fetch_assoc($result);
 
 // Ambil senarai employee ikut position
-$engineers = mysqli_query($conn, "SELECT Employee_ID, Employee_Name FROM employee WHERE Employee_Position='Site Engineer'");
+$engineers   = mysqli_query($conn, "SELECT Employee_ID, Employee_Name FROM employee WHERE Employee_Position='Site Engineer'");
 $supervisors = mysqli_query($conn, "SELECT Employee_ID, Employee_Name FROM employee WHERE Employee_Position='Site Supervisor'");
-$workers = mysqli_query($conn, "SELECT Employee_ID, Employee_Name FROM employee WHERE Employee_Position='General Worker'");
+$workers     = mysqli_query($conn, "SELECT Employee_ID, Employee_Name FROM employee WHERE Employee_Position='General Worker'");
 
 // Ambil semua equipment
 $equipments = mysqli_query($conn, "SELECT * FROM equipment");
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Project Detail</title>
-<style>
-body {margin:0; font-family:Arial; background:#ffffff;}
-.header {background:#e0e0e0; padding:15px; font-size:20px; color:#000; border-bottom:1px solid #ccc;}
-.sidebar {width:200px; background:#d6d6d6; height:100vh; position:fixed; top:0; left:0; padding-top:30px; border-right:1px solid #bbb;}
-.sidebar a {display:block; color:#000; padding:12px; text-decoration:none;}
-.sidebar a:hover {background:#c0c0c0;}
-.content {margin-left:220px; padding:20px;}
-form {background:#f9f9f9; padding:20px; border:1px solid #ccc; border-radius:8px;}
-label {font-weight:bold;}
-table {width:100%; border-collapse:collapse; margin-top:10px;}
-th, td {border:1px solid #ccc; padding:8px; text-align:center;}
-th {background:#d6d6d6;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Detail - DrillTech Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            color: #222;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: #4a4a4a;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
+            z-index: 1000;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        .header-welcome {
+            color: white;
+            font-size: 15px;
+        }
+
+        /* ===== LAYOUT ===== */
+        .wrapper {
+            display: flex;
+            margin-top: 60px;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 240px;
+            background: #5a5a5a;
+            min-height: calc(100vh - 60px);
+            flex-shrink: 0;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background: #7a7a7a;
+        }
+
+        /* ===== CONTENT ===== */
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        /* ===== BOX ===== */
+        .box {
+            background: #dcdcdc;
+            border: 1px solid #bbb;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .box h2 {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #888;
+            padding-bottom: 8px;
+        }
+        .box p {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        /* ===== FORM ===== */
+        .form-box {
+            background: #dcdcdc;
+            border: 1px solid #bbb;
+            border-radius: 10px;
+            padding: 25px;
+        }
+        .form-box h3 {
+            margin: 20px 0 10px;
+            color: #333;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 5px;
+        }
+        .form-box label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-box select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #bbb;
+            background: #f0f0f0;
+            font-size: 14px;
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 15px;
+        }
+        .form-box input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .checkbox-item {
+            margin-bottom: 6px;
+        }
+        .form-box button {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: #5a5a5a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .form-box button:hover {
+            background: #3a3a3a;
+        }
+
+        /* ===== TABLE ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #f0f0f0;
+        }
+        th, td {
+            border: 1px solid #bbb;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #5a5a5a;
+            color: white;
+        }
+        tr:hover { background: #e0e0e0; }
+
+        .form-box input[type="text"] {
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid #bbb;
+            background: #f0f0f0;
+            font-size: 14px;
+            width: 150px;
+        }
+    </style>
 </head>
 <body>
-<div class="header">Welcome, <?php echo $_SESSION['admin_name']; ?></div>
-<div class="sidebar">
-  <a href="admin.php">Dashboard</a>
-  <a href="projectAD.php" style="background:#c0c0c0;">Project</a>
-  <a href="employeeAD.php">Employee</a>
-</div>
-<div class="content">
-  <h2>Project Detail</h2>
-  <p><b>PROJECT ID:</b> <?php echo $project['Project_ID']; ?></p>
-  <p><b>PROJECT NAME:</b> <?php echo $project['Project_Name']; ?></p>
-  <p><b>CLIENT:</b> <?php echo $project['Client_ID']; ?></p>
 
-  <form method="post">
-    <h3>Assign Employee by Position</h3>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <span style="font-size:32px; margin-right:10px;">🔧</span>
+            DRILLTECH
+        </div>
+        <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
+    </div>
 
-    <label>Site Engineer:</label><br>
-    <select name="engineer">
-      <?php while($row=mysqli_fetch_assoc($engineers)){ ?>
-        <option value="<?php echo $row['Employee_ID']; ?>">
-          <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
-        </option>
-      <?php } ?>
-    </select><br><br>
+    <!-- Wrapper -->
+    <div class="wrapper">
 
-    <label>Site Supervisor:</label><br>
-    <select name="supervisor">
-      <?php while($row=mysqli_fetch_assoc($supervisors)){ ?>
-        <option value="<?php echo $row['Employee_ID']; ?>">
-          <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
-        </option>
-      <?php } ?>
-    </select><br><br>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <a href="admin.php">📊 DASHBOARD</a>
+            <a href="projectAD.php" class="active">📁 PROJECT</a>
+            <a href="employeeAD.php">👷 EMPLOYEE</a>
+        </div>
 
-    <label>General Worker (pilih max 5):</label><br>
-    <?php while($row=mysqli_fetch_assoc($workers)){ ?>
-      <input type="checkbox" name="workers[]" value="<?php echo $row['Employee_ID']; ?>">
-      <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?><br>
-    <?php } ?>
-    <br>
+        <!-- Content -->
+        <div class="content">
 
-    <h3>Equipment Assignment</h3>
-    <table>
-      <tr>
-        <th>Equipment ID</th>
-        <th>Equipment Name</th>
-        <th>Duration / Unit</th>
-      </tr>
-      <?php while($eq=mysqli_fetch_assoc($equipments)){ ?>
-      <tr>
-        <td><?php echo $eq['Equipment_ID']; ?></td>
-        <td><?php echo $eq['Equipment_Name']; ?></td>
-        <td>
-          <?php if(strtolower($eq['Equipment_Name']) == "pipeline"){ ?>
-            <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 80 unit">
-          <?php } else { ?>
-            <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 30 days">
-          <?php } ?>
-        </td>
-      </tr>
-      <?php } ?>
-    </table><br>
+            <!-- Project Info -->
+            <div class="box">
+                <h2>Project Detail</h2>
+                <p><b>PROJECT ID:</b> <?php echo htmlspecialchars($project['Project_ID']); ?></p>
+                <p><b>PROJECT NAME:</b> <?php echo htmlspecialchars($project['Project_Name']); ?></p>
+                <p><b>CLIENT:</b> <?php echo htmlspecialchars($project['Client_ID']); ?></p>
+            </div>
 
-    <input type="hidden" name="project_id" value="<?php echo $project['Project_ID']; ?>">
-    <button type="submit">Save Project Detail</button>
-  </form>
-</div>
+            <!-- Form -->
+            <div class="form-box">
+                <form method="post">
+
+                    <h3>Assign Employee by Position</h3>
+
+                    <label>Site Engineer:</label>
+                    <select name="engineer">
+                        <?php while($row = mysqli_fetch_assoc($engineers)){ ?>
+                            <option value="<?php echo $row['Employee_ID']; ?>">
+                                <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+
+                    <label>Site Supervisor:</label>
+                    <select name="supervisor">
+                        <?php while($row = mysqli_fetch_assoc($supervisors)){ ?>
+                            <option value="<?php echo $row['Employee_ID']; ?>">
+                                <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+
+                    <label>General Worker (pilih max 5):</label>
+                    <?php while($row = mysqli_fetch_assoc($workers)){ ?>
+                        <div class="checkbox-item">
+                            <input type="checkbox" name="workers[]" value="<?php echo $row['Employee_ID']; ?>">
+                            <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
+                        </div>
+                    <?php } ?>
+
+                    <h3>Equipment Assignment</h3>
+                    <table>
+                        <tr>
+                            <th>Equipment ID</th>
+                            <th>Equipment Name</th>
+                            <th>Duration / Unit</th>
+                        </tr>
+                        <?php while($eq = mysqli_fetch_assoc($equipments)){ ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($eq['Equipment_ID']); ?></td>
+                            <td><?php echo htmlspecialchars($eq['Equipment_Name']); ?></td>
+                            <td>
+                                <?php if(strtolower($eq['Equipment_Name']) == "pipeline"){ ?>
+                                    <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 80 unit">
+                                <?php } else { ?>
+                                    <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 30 days">
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <?php } ?>
+                    </table>
+
+                    <input type="hidden" name="project_id" value="<?php echo htmlspecialchars($project['Project_ID']); ?>">
+                    <button type="submit">Save Project Detail</button>
+
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
 </body>
 </html>
