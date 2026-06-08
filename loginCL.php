@@ -13,7 +13,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         if (mysqli_num_rows($result)==1){
             $row = mysqli_fetch_assoc($result);
             $_SESSION['client_id']= $row['Client_ID'];
-            $_SESSION['username']= $row['Client_Name'];
+            $_SESSION['client_name']= $row['Client_Name'];
             header("Location: client.php");
             exit();
         }else {
