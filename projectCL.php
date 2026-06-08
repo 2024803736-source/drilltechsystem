@@ -30,7 +30,7 @@ $projects = mysqli_query($conn, "
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('ss1.jpg') center/cover no-repeat fixed;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('backgroundCSC264.png') center/cover no-repeat fixed;
             color: white;
             min-height: 100vh;
         }
@@ -171,11 +171,11 @@ $projects = mysqli_query($conn, "
             </table>
 
             <!-- Centered Button -->
-            <div class="button-container">
-                <button class="add-project" onclick="alert('Add New Project feature coming soon!')">
-                    Add Project (+)
-                </button>
-            </div>
+         <div class="button-container">
+         <a href="addProjectCL.php">
+        <button class="add-project">Add Project (+)</button>
+         </a>
+         </div>
         </div>
     </div>
 </body>
