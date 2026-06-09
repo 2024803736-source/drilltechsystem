@@ -4,7 +4,7 @@ if(!isset($_SESSION['username'])){
     header("Location: loginEM.php");
     exit();
 }
-include("database.php"); // sambung database
+include("database.php");
 
 // Cari Employee_ID berdasarkan username login
 $employeeName = $_SESSION['username'];
@@ -12,115 +12,134 @@ $empQuery = mysqli_query($conn, "SELECT Employee_ID FROM employee WHERE Employee
 $empRow = mysqli_fetch_assoc($empQuery);
 $employeeID = $empRow['Employee_ID'];
 
-// Active Projects untuk employee login
-$activeProjects = mysqli_query($conn, "
-    SELECT p.Project_Name, p.Project_Status 
-    FROM project p
+// Statistik projek untuk employee login
+$pending = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) as c 
+    FROM project p 
     JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
-    WHERE ae.Employee_ID = '$employeeID' AND p.Project_Status='On Going'
-");
+    WHERE ae.Employee_ID='$employeeID' AND p.Project_Status='Pending'
+"))['c'] ?? 0;
 
-// Completed Projects untuk employee login
-$completedProjects = mysqli_query($conn, "
-    SELECT p.Project_Name 
-    FROM project p
+$active = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) as c 
+    FROM project p 
     JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
-    WHERE ae.Employee_ID = '$employeeID' AND p.Project_Status='Completed'
-");
+    WHERE ae.Employee_ID='$employeeID' AND p.Project_Status='On Going'
+"))['c'] ?? 0;
+
+$completed = mysqli_fetch_assoc(mysqli_query($conn, "
+    SELECT COUNT(*) as c 
+    FROM project p 
+    JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
+    WHERE ae.Employee_ID='$employeeID' AND p.Project_Status='Completed'
+"))['c'] ?? 0;
 
 // Recent Updates projek yang employee login terlibat
 $recentUpdates = mysqli_query($conn, "
     SELECT p.Project_Name, p.Project_Status 
     FROM project p
     JOIN assigned_employee ae ON p.Project_ID = ae.Project_ID
-    WHERE ae.Employee_ID = '$employeeID'
+    WHERE ae.Employee_ID='$employeeID'
     ORDER BY p.Project_ID DESC LIMIT 5
 ");
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Employee Dashboard</title>
+    <meta charset="UTF-8">
+    <title>Employee Dashboard - DrillTech HDD</title>
     <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background-image: url('images/construction_bg.jpg');
-            background-size: cover;
             font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('images/construction_bg.jpg') center/cover no-repeat fixed;
             color: white;
-            margin: 0;
+            min-height: 100vh;
         }
         .header {
-            background-color: #006400;
-            padding: 15px;
-            font-size: 20px;
-            color: white;
+            background:#004d00;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+        .logo { font-size: 24px; font-weight: bold; }
         .sidebar {
-            width: 200px;
-            background-color: #006400;
-            height: 100vh;
+            width: 240px;
+            background: #004d00;
             position: fixed;
-            padding-top: 30px;
+            height: 100vh;
+            padding-top: 20px;
         }
         .sidebar a {
-            display: block;
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
             color: white;
-            padding: 12px;
             text-decoration: none;
         }
-        .sidebar a:hover {
-            background-color: #228B22;
+        .sidebar a:hover, .sidebar a.active { background: #ff8c00; }
+        .content { margin-left: 260px; padding: 30px; }
+        .welcome { font-size: 28px; margin-bottom: 25px; }
+        .stats { display:flex; gap:20px; margin-bottom:30px; }
+        .stat-card {
+            flex:1; background:rgba(0,0,0,0.7);
+            padding:20px; border-radius:10px; text-align:center;
         }
-        .content {
-            margin-left: 220px;
-            padding: 20px;
+        .stat-number { font-size:42px; font-weight:bold; }
+        .recent-updates {
+            background:rgba(0,0,0,0.7);
+            padding:25px; border-radius:10px;
         }
-        .card {
-            background-color: rgba(0, 100, 0, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        h1, h2 {
-            color: #FFD700;
-        }
+        .recent-updates h3 { margin-bottom:15px; border-bottom:2px solid #ff8c00; padding-bottom:8px; }
     </style>
 </head>
 <body>
-    <div class="header">Welcome, Employee <?php echo $_SESSION['username']; ?></div>
+    <div class="header">
+        <div class="logo">👷 DRILLTECH</div>
+        <div>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></div>
+    </div>
 
-<div class="sidebar">
-    <a href="employee.php">Dashboard</a>
-    <a href="projectEM.php">Project</a>
-    <a href="profileEM.php">Profile</a>
-    <a href="payrollEM.php">Payroll</a>
-</div>
+    <div class="sidebar">
+        <a href="employee.php" class="active">📊 DASHBOARD</a>
+        <a href="projectEM.php">🔍 PROJECT</a>
+        <a href="profileEM.php">👤 PROFILE</a>
+        <a href="payrollEM.php">💰 PAYROLL</a>
+    </div>
 
     <div class="content">
-        <div class="card">
-            <h2>Active Projects</h2>
-            <ul>
-                <?php while($row = mysqli_fetch_assoc($activeProjects)) { ?>
-                    <li><?php echo $row['Project_Name']; ?></li>
-                <?php } ?>
-            </ul>
+        <h1 class="welcome">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div>PENDING PROJECTS</div>
+                <div class="stat-number" style="color:#ffcc00;"><?php echo $pending; ?></div>
+                <small>Awaiting Approval</small>
+            </div>
+            <div class="stat-card">
+                <div>ACTIVE PROJECTS</div>
+                <div class="stat-number" style="color:#00cc66;"><?php echo $active; ?></div>
+                <small>In Progress</small>
+            </div>
+            <div class="stat-card">
+                <div>COMPLETED PROJECTS</div>
+                <div class="stat-number" style="color:#3399ff;"><?php echo $completed; ?></div>
+                <small>Completed</small>
+            </div>
         </div>
 
-        <div class="card">
-            <h2>Completed Projects</h2>
-            <ul>
-                <?php while($row = mysqli_fetch_assoc($completedProjects)) { ?>
-                    <li><?php echo $row['Project_Name']; ?></li>
-                <?php } ?>
-            </ul>
-        </div>
-
-        <div class="card">
-            <h2>Recent Updates</h2>
-            <ul>
-                <?php while($row = mysqli_fetch_assoc($recentUpdates)) { ?>
-                    <li><?php echo $row['Project_Name']; ?></li>
-                <?php } ?>
+        <div class="recent-updates">
+            <h3>Recent Updates:</h3>
+            <ul style="list-style:none;">
+                <?php while($row = mysqli_fetch_assoc($recentUpdates)): ?>
+                    <li style="margin:12px 0;">
+                        ► <strong><?php echo htmlspecialchars($row['Project_Name']); ?></strong> 
+                        - <?php echo $row['Project_Status']; ?>
+                    </li>
+                <?php endwhile; ?>
+                <?php if(mysqli_num_rows($recentUpdates) == 0): ?>
+                    <li>No recent updates available.</li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>

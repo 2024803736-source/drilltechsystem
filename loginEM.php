@@ -16,7 +16,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $row = mysqli_fetch_assoc($result);
             // Simpan dalam session
             $_SESSION['employee_id']   = $row['Employee_ID'];
-            $_SESSION['username']      = $row['Employee_Name']; // untuk display "Welcome, Abu"
+            $_SESSION['username']      = $row['Employee_Name']; 
             header("Location: employee.php");
             exit();
         } else {
@@ -28,19 +28,76 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Employee Login</title>
+    <meta charset="UTF-8">
+    <title>Employee Login - DrillTech HDD</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), 
+                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .login-box {
+            background: rgba(0, 77, 0, 0.95);
+            padding: 40px 35px;
+            border-radius: 16px;
+            width: 420px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+        .logo {
+            font-size: 52px;
+            margin-bottom: 8px;
+        }
+        h1 { font-size: 26px; margin-bottom: 6px; }
+        p.subtitle { margin-bottom: 30px; opacity: 0.9; font-size: 15px; }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            color: #333;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn:hover { background: #218838; }
+        .error { color: #ff6b6b; margin-top: 15px; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <h2>Login</h2>
-    <form method="post">
-        <label>Employee ID:</label><br>
-        <input type="text" name="employee_id" required><br>
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
-        <input type="submit" value="Login">
-    </form>
-    <?php if(isset($error)) echo "<p style='color:red;'>$error</p>"; ?>
+    <div class="login-box">
+        <div class="logo">👷</div>
+        <h1>DRILLTECH HDD</h1>
+        <p class="subtitle">Employee Portal</p>
+
+        <form method="post">
+            <input type="text" name="employee_id" placeholder="Employee ID" required>
+            <input type="password" name="password" placeholder="Password (Default: 101)" required>
+            <button type="submit" class="btn">LOG IN</button>
+        </form>
+
+        <?php if(isset($error)) echo "<p class='error'>$error</p>"; ?>
+    </div>
 </body>
 </html>

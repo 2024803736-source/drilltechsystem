@@ -13,107 +13,76 @@ $result = mysqli_query($conn, "SELECT * FROM employee WHERE Employee_ID='$employ
 $row = mysqli_fetch_assoc($result);
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Profile Dashboard</title>
+    <meta charset="UTF-8">
+    <title>Profile - DrillTech HDD</title>
     <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background-image: url('images/construction_bg.jpg');
-            background-size: cover;
             font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('images/construction_bg.jpg') center/cover no-repeat fixed;
             color: white;
-            margin: 0;
+            min-height: 100vh;
         }
         .header {
-            background-color: #006400;
-            padding: 15px;
-            font-size: 20px;
-            color: white;
+            background:#004d00;;
+            padding:15px 30px;
+            display:flex; align-items:center; justify-content:space-between;
         }
+        .logo { font-size:26px; font-weight:bold; }
         .sidebar {
-            width: 200px;
-            background-color: #006400;
-            height: 100vh;
-            position: fixed;
-            padding-top: 30px;
+            width:240px; background:#004d00;; position:fixed; height:100vh; padding-top:20px;
         }
         .sidebar a {
-            display: block;
-            color: white;
-            padding: 12px;
-            text-decoration: none;
+            display:flex; align-items:center; padding:15px 25px; color:white; text-decoration:none; gap:10px;
         }
-        .sidebar a:hover {
-            background-color: #228B22;
+        .sidebar a:hover, .sidebar a.active { background:#ff8c00; }
+        .content { margin-left:260px; padding:30px; }
+        .main-box {
+            background:rgba(0,0,0,0.8); border-radius:12px; padding:25px; width:500px; margin:auto;
         }
-        .content {
-            margin-left: 220px;
-            padding: 20px;
+        h2 { color:#ffcc00; margin-bottom:20px; text-align:center; }
+        .profile-img { text-align:center; margin-bottom:20px; }
+        .profile-img img {
+            width:200px; height:200px; border-radius:50%; border:5px solid #004d00;
         }
-        .profile-card {
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border-radius: 10px;
-            width: 400px;
-            margin: auto;
-            text-align: left;
-        }
-        h2 {
-            color: #FFD700;
-        }
-        .button-container {
-            margin-top: 20px;
-            text-align: center;
-        }
+        p { margin:10px 0; font-size:16px; }
+        .button-container { text-align:center; margin-top:20px; }
         .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
+            padding:10px 20px; border:none; border-radius:20px; cursor:pointer; font-weight:bold;
         }
-        .update-btn {
-            background-color: #32CD32;
-            color: white;
-            margin-right: 10px;
-        }
-        .edit-btn {
-            background-color: #1E90FF;
-            color: white;
-        }
+        .edit-btn { background:#1E90FF; color:white; }
     </style>
 </head>
 <body>
-    <div class="header">Welcome, <?php echo $_SESSION['username']; ?></div>
+    <div class="header">
+        <div class="logo">👷 DRILLTECH</div>
+        <div>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></div>
+    </div>
 
     <div class="sidebar">
-        <a href="employee.php">Dashboard</a>
-        <a href="projectEM.php">Project</a>
-        <a href="profileEM.php">Profile</a>
-        <a href="payrollEM.php">Payroll</a>
+        <a href="employee.php">📊 DASHBOARD</a>
+        <a href="projectEM.php">🔍 PROJECT</a>
+        <a href="profileEM.php" class="active">👤 PROFILE</a>
+        <a href="payrollEM.php">💰 PAYROLL</a>
     </div>
 
     <div class="content">
-        <div class="profile-card">
-    <h2>Personal Details</h2>
-    
-    <!-- Slot gambar profile -->
-    <div style="text-align:center; margin-bottom:15px;">
-        <img src="images/gambar/<?php echo $employeeID; ?>.jpg" 
-             alt="Profile Picture" 
-             style="width:200px;height:200px;border-radius:50%;border:5px solid #006400;">
-    </div>
+        <div class="main-box">
+            <h2>Personal Details</h2>
+            <div class="profile-img">
+                <img src="images/gambar/<?php echo $employeeID; ?>.jpg" alt="Profile Picture">
+            </div>
+            <p><strong>Name:</strong> <?php echo $row['Employee_Name']; ?></p>
+            <p><strong>Contact:</strong> <?php echo $row['Employee_Contact']; ?></p>
+            <p><strong>Gender:</strong> <?php echo $row['Employee_Gender']; ?></p>
+            <p><strong>Position:</strong> <?php echo $row['Employee_Position']; ?></p>
+            <p><strong>Address:</strong> <?php echo $row['Employee_Address']; ?></p>
 
-    <p><strong>Name:</strong> <?php echo $row['Employee_Name']; ?></p>
-    <p><strong>Contact:</strong> <?php echo $row['Employee_Contact']; ?></p>
-    <p><strong>Gender:</strong> <?php echo $row['Employee_Gender']; ?></p>
-    <p><strong>Position:</strong> <?php echo $row['Employee_Position']; ?></p>
-    <p><strong>Address:</strong> <?php echo $row['Employee_Address']; ?></p>
-</div>
-
-
-        <div class="button-container">
-            <button class="btn edit-btn" onclick="window.location.href='editProfileEM.php'">Edit Personal Details</button>
+            <div class="button-container">
+                <button class="btn edit-btn" onclick="window.location.href='editProfileEM.php'">Edit Personal Details</button>
+            </div>
         </div>
     </div>
 </body>
