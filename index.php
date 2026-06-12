@@ -15,9 +15,16 @@ if (!isset($_SESSION['admin_id'])) {
 // Extract identity token safely
 $admin_name = $_SESSION['admin_name'] ?? 'Admin User';
 
-// 2. Fetch live data sets from your 9 system tables
-$dashboard_projects = mysqli_query($conn, "SELECT * FROM project");
-$report_projects    = mysqli_query($conn, "SELECT * FROM project");
+// 2. Fetch live data sets from your system tables
+// FIX: Fetch project data ONCE and store it in an array to prevent dual-cursor data drops
+$project_query = mysqli_query($conn, "SELECT * FROM project");
+$all_projects = [];
+if ($project_query) {
+    while ($row = mysqli_fetch_assoc($project_query)) {
+        $all_projects[] = $row;
+    }
+}
+
 $employee_records   = mysqli_query($conn, "SELECT * FROM employee");
 $payroll_records    = mysqli_query($conn, "SELECT * FROM payroll");
 ?>
@@ -372,19 +379,19 @@ $payroll_records    = mysqli_query($conn, "SELECT * FROM payroll");
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while($proj = mysqli_fetch_assoc($dashboard_projects)): 
-                                // Map status value string directly onto styled component pill selectors
+                            <?php foreach($all_projects as $proj): 
                                 $status_class = "status-pending";
-                                if(strtolower($proj['status']) == 'on going' || strtolower($proj['status']) == 'ongoing') $status_class = "status-ongoing";
-                                if(strtolower($proj['status']) == 'completed') $status_class = "status-completed";
+                                $check_status = strtolower($proj['status'] ?? $proj['Status'] ?? '');
+                                if($check_status == 'on going' || $check_status == 'ongoing') $status_class = "status-ongoing";
+                                if($check_status == 'completed') $status_class = "status-completed";
                             ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($proj['project_ID'] ?? $proj['Project_ID'] ?? ''); ?></td>
                                 <td style="font-weight:500;"><?php echo htmlspecialchars($proj['project_name'] ?? $proj['Project_Name'] ?? ''); ?></td>
                                 <td><?php echo htmlspecialchars($proj['client_ID'] ?? $proj['Client_ID'] ?? 'N/A'); ?></td>
-                                <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($proj['status'] ?? 'Pending'); ?></span></td>
+                                <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($proj['status'] ?? $proj['Status'] ?? 'Pending'); ?></span></td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -501,17 +508,18 @@ $payroll_records    = mysqli_query($conn, "SELECT * FROM payroll");
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while($rep = mysqli_fetch_assoc($report_projects)): 
+                            <?php foreach($all_projects as $rep): 
                                 $rep_status = "status-pending";
-                                if(strtolower($rep['status']) == 'on going' || strtolower($rep['status']) == 'ongoing') $rep_status = "status-ongoing";
-                                if(strtolower($rep['status']) == 'completed') $rep_status = "status-completed";
+                                $check_rep_status = strtolower($rep['status'] ?? $rep['Status'] ?? '');
+                                if($check_rep_status == 'on going' || $check_rep_status == 'ongoing') $rep_status = "status-ongoing";
+                                if($check_rep_status == 'completed') $rep_status = "status-completed";
                             ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($rep['project_ID'] ?? $rep['Project_ID'] ?? ''); ?></td>
                                 <td style="font-weight: 500;"><?php echo htmlspecialchars($rep['project_name'] ?? $rep['Project_Name'] ?? ''); ?></td>
-                                <td><span class="status-badge <?php echo $rep_status; ?>"><?php echo htmlspecialchars($rep['status'] ?? 'Pending'); ?></span></td>
+                                <td><span class="status-badge <?php echo $rep_status; ?>"><?php echo htmlspecialchars($rep['status'] ?? $rep['Status'] ?? 'Pending'); ?></span></td>
                             </tr>
-                            <?php endwhile; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
