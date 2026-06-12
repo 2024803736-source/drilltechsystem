@@ -1,9 +1,25 @@
 <?php
-include("database.php"); // Connect DB
+// 1. Initialize session handler at the absolute top of the file
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-$result = mysqli_query($conn, "SELECT * FROM admin ");
-// Set a fallback if session name isn't set yet
-$admin_name = $_SESSION['admin_name'] ?? 'Admin';
+include("database.php"); // Connect to your XAMPP MySQL Database
+
+// Security Guard: Kick unauthenticated traffic back to the login portal
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: loginAD.php");
+    exit();
+}
+
+// Extract identity token safely
+$admin_name = $_SESSION['admin_name'] ?? 'Admin User';
+
+// 2. Fetch live data sets from your 9 system tables
+$dashboard_projects = mysqli_query($conn, "SELECT * FROM project");
+$report_projects    = mysqli_query($conn, "SELECT * FROM project");
+$employee_records   = mysqli_query($conn, "SELECT * FROM employee");
+$payroll_records    = mysqli_query($conn, "SELECT * FROM payroll");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -87,6 +103,22 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
         .header-welcome span {
             color: var(--text-main);
             font-weight: 600;
+        }
+
+        .logout-link {
+            color: #ff4d4d;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 20px;
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .logout-link:hover {
+            background: rgba(255, 77, 77, 0.1);
         }
 
         /* ===== LAYOUT ====== */
@@ -188,7 +220,7 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
             gap: 8px;
         }
         
-        .form-group h3, .form-group label {
+        .form-group label {
             font-size: 13px;
             color: var(--text-muted);
             font-weight: 600;
@@ -249,7 +281,6 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
             background: rgba(255, 255, 255, 0.01); 
         }
 
-        /* Table Inputs inside editing state */
         table input[type="text"] {
             width: 100%;
             padding: 6px 10px;
@@ -269,6 +300,7 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
             border-radius: 50px;
             font-size: 12px;
             font-weight: 600;
+            text-transform: capitalize;
         }
         
         .status-ongoing { color: var(--status-ongoing); background: var(--status-ongoing-bg); }
@@ -308,7 +340,10 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
             </svg>
             DRILLTECH
         </div>
-        <div class="header-welcome">Logged in as: <span><?php echo htmlspecialchars($admin_name); ?></span></div>
+        <div class="header-welcome">
+            Logged in as: <span><?php echo htmlspecialchars($admin_name); ?></span>
+            <a href="logout.php" class="logout-link">Sign Out</a>
+        </div>
     </div>
 
     <div class="wrapper">
@@ -329,12 +364,27 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr><th>Project ID</th><th>Project Name</th><th>Client</th><th>Status</th><th>Start Date</th><th>End Date</th></tr>
+                            <tr>
+                                <th>Project ID</th>
+                                <th>Project Name</th>
+                                <th>Client ID</th>
+                                <th>Status</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>A01</td><td style="font-weight:500;">River Crossing</td><td>ABC Corp</td><td><span class="status-badge status-completed">Completed</span></td><td>01/04/2026</td><td>30/06/2026</td></tr>
-                            <tr><td>A02</td><td style="font-weight:500;">Pipeline Delta</td><td>XYZ Holdings</td><td><span class="status-badge status-pending">Pending</span></td><td>15/05/2026</td><td>15/08/2026</td></tr>
-                            <tr><td>A03</td><td style="font-weight:500;">Site Alpha</td><td>MegaBuild</td><td><span class="status-badge status-ongoing">On Going</span></td><td>01/01/2026</td><td>15/03/2026</td></tr>
+                            <?php while($proj = mysqli_fetch_assoc($dashboard_projects)): 
+                                // Map status value string directly onto styled component pill selectors
+                                $status_class = "status-pending";
+                                if(strtolower($proj['status']) == 'on going' || strtolower($proj['status']) == 'ongoing') $status_class = "status-ongoing";
+                                if(strtolower($proj['status']) == 'completed') $status_class = "status-completed";
+                            ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($proj['project_ID'] ?? $proj['Project_ID'] ?? ''); ?></td>
+                                <td style="font-weight:500;"><?php echo htmlspecialchars($proj['project_name'] ?? $proj['Project_Name'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($proj['client_ID'] ?? $proj['Client_ID'] ?? 'N/A'); ?></td>
+                                <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($proj['status'] ?? 'Pending'); ?></span></td>
+                            </tr>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
@@ -343,7 +393,7 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
             <div id="project" class="card hidden">
                 <h2>Project Assignment</h2>
                 <div class="project-meta">
-                    <strong>Project ID:</strong> A03 &nbsp;|&nbsp; <strong>Project Name:</strong> Site Alpha &nbsp;|&nbsp; <strong>Client:</strong> MegaBuild
+                    <strong>Focus Operations Target:</strong> Active Project Management Framework
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
@@ -364,9 +414,6 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
 
             <div id="equipment" class="card hidden">
                 <h2>Project Equipment</h2>
-                <div class="project-meta">
-                    <strong>Project ID:</strong> A03 &nbsp;|&nbsp; <strong>Project Name:</strong> Site Alpha &nbsp;|&nbsp; <strong>Client:</strong> MegaBuild
-                </div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Machine Type</label>
@@ -389,12 +436,22 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
                 <div class="table-container">
                     <table id="employeeTable">
                         <thead>
-                            <tr><th>Employee ID</th><th>Name</th><th>Position</th><th>Contact</th><th>Assigned Project</th><th>Payroll</th></tr>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Contact</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>E-1001</td><td>Ahmad Zulkifli</td><td>Technician</td><td>012-3456789</td><td>Site Alpha</td><td>RM3500</td></tr>
-                            <tr><td>E-1002</td><td>Nur Aisyah</td><td>Supervisor</td><td>013-9876543</td><td>Pipeline Delta</td><td>RM4800</td></tr>
-                            <tr><td>E-1003</td><td>Lim Wei Han</td><td>Engineer</td><td>017-2233445</td><td>Hilltop Install</td><td>RM5000</td></tr>
+                            <?php while($emp = mysqli_fetch_assoc($employee_records)): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($emp['employee_ID'] ?? $emp['Employee_ID'] ?? ''); ?></td>
+                                <td style="font-weight:500;"><?php echo htmlspecialchars($emp['name'] ?? $emp['Name'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($emp['position'] ?? $emp['Position'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($emp['contact'] ?? $emp['Contact'] ?? ''); ?></td>
+                            </tr>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
@@ -409,12 +466,20 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
                 <div class="table-container">
                     <table id="payrollTable">
                         <thead>
-                            <tr><th>Payroll ID</th><th>Employee ID</th><th>Amount</th><th>Status</th><th>Date</th><th>Type</th></tr>
+                            <tr>
+                                <th>Payroll ID</th>
+                                <th>Employee ID</th>
+                                <th>Amount</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>PR-001</td><td>E-1001</td><td>RM 3,200</td><td>Paid</td><td>01/05/2026</td><td>Part Time</td></tr>
-                            <tr><td>PR-005</td><td>E-1002</td><td>RM 4,500</td><td>Paid</td><td>01/05/2026</td><td>Full Time</td></tr>
-                            <tr><td>PR-018</td><td>E-1003</td><td>RM 5,000</td><td>Paid</td><td>01/05/2026</td><td>Full Time</td></tr>
+                            <?php while($pay = mysqli_fetch_assoc($payroll_records)): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($pay['payroll_ID'] ?? $pay['Payroll_ID'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($pay['employee_ID'] ?? $pay['Employee_ID'] ?? ''); ?></td>
+                                <td style="font-weight:600; color:var(--status-completed);">RM <?php echo htmlspecialchars($pay['amount'] ?? $pay['Amount'] ?? '0.00'); ?></td>
+                            </tr>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
@@ -429,10 +494,24 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
                 <div class="table-container">
                     <table>
                         <thead>
-                            <tr><th>Project ID</th><th>Project Name</th><th>Status</th><th>Value</th><th>Deadline</th></tr>
+                            <tr>
+                                <th>Project ID</th>
+                                <th>Project Name</th>
+                                <th>Current Execution Status</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <tr><td>A01</td><td style="font-weight: 500;">Site Alpha</td><td><span class="status-badge status-ongoing">On Going</span></td><td style="font-weight:600;">RM 800,000.00</td><td>15/06/2026</td></tr>
+                            <?php while($rep = mysqli_fetch_assoc($report_projects)): 
+                                $rep_status = "status-pending";
+                                if(strtolower($rep['status']) == 'on going' || strtolower($rep['status']) == 'ongoing') $rep_status = "status-ongoing";
+                                if(strtolower($rep['status']) == 'completed') $rep_status = "status-completed";
+                            ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($rep['project_ID'] ?? $rep['Project_ID'] ?? ''); ?></td>
+                                <td style="font-weight: 500;"><?php echo htmlspecialchars($rep['project_name'] ?? $rep['Project_Name'] ?? ''); ?></td>
+                                <td><span class="status-badge <?php echo $rep_status; ?>"><?php echo htmlspecialchars($rep['status'] ?? 'Pending'); ?></span></td>
+                            </tr>
+                            <?php endwhile; ?>
                         </tbody>
                     </table>
                 </div>
@@ -442,28 +521,18 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
     </div>
 
     <script>
-        // Track unique edit states dynamically across panels
-        const editStates = {
-            employee: false,
-            payroll: false
-        };
+        const editStates = { employee: false, payroll: false };
 
-        // Navigation Controller
         function showSection(sectionId) {
-            // Drop hidden tokens on modules
             const sections = document.querySelectorAll('.main > .card');
             sections.forEach(sec => sec.classList.add('hidden'));
-
-            // Wake targeted workspace
             document.getElementById(sectionId).classList.remove('hidden');
 
-            // Handle matching active flags across sidebar links
             const links = document.querySelectorAll('.sidebar a');
             links.forEach(link => link.classList.remove('active'));
             document.getElementById(`nav-${sectionId}`).classList.add('active');
         }
 
-        // Standardized Multi-Table Core Row Inline Matrix Editor
         function enableEditing(tableId, stateKey) {
             if (editStates[stateKey]) return;
             editStates[stateKey] = true;
@@ -480,7 +549,6 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
             });
         }
 
-        // Standardized Table Matrix Data Sync Engine
         function saveChanges(tableId, stateKey) {
             if (!editStates[stateKey]) return;
             editStates[stateKey] = false;
@@ -501,44 +569,3 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
     </script>
 </body>
 </html>
-   <title>Admin Dashboard</title>
-    <style>
-        body {
-            background-image: url('images/construction_bg.jpg');
-            background-size: cover;
-            font-family: Arial, sans-serif;
-            color: white;
-            margin: 0;
-        }
-        .header {
-            background-color: #827c7cea;
-            padding: 15px;
-            font-size: 20px;
-            color: white;
-        }
-        .sidebar {
-            width: 200px;
-            background-color: #827c7cea;
-            height: 100vh;
-            position: fixed;
-            padding-top: 30px;
-        }
-        .sidebar a {
-            display: block;
-            color: white;
-            padding: 12px;
-            text-decoration: none;
-        }
-        .sidebar a:hover {
-            background-color: #827c7cea;
-        }
-        .content {
-            margin-left: 220px;
-            padding: 20px;
-        }
-        .card {
-            background-color: rgba(99, 105, 99, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
