@@ -9,13 +9,6 @@ if(!isset($_SESSION['admin_id'])){
 include("database.php");
 
 $admin_name = $_SESSION['admin_name'] ?? 'Admin';
-
-$query = "SELECT e.Employee_ID, e.Employee_Name, e.Employee_Position, e.Employee_Contact,
-                 pr.Payroll_ID, pr.Payroll_Amount, pr.Payroll_Status, pr.Payroll_Date, pr.Payroll_Type
-          FROM employee e
-          LEFT JOIN payroll pr ON e.Employee_ID = pr.Employee_ID
-          ORDER BY e.Employee_ID, pr.Payroll_Date";
-$result = mysqli_query($conn, $query);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,17 +17,23 @@ $result = mysqli_query($conn, $query);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee - DrillTech Admin</title>
     <style>
+        /* Reset & Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('images/construction_bg.jpg') center/cover no-repeat fixed;
-            color: black;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* Lighter grey-tinted construction background overlay */
+            background: linear-gradient(rgba(74, 74, 74, 0.45), rgba(15, 15, 15, 0.95)), 
+                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+            color: #f8fafc;
             min-height: 100vh;
         }
-        /* ===== HEADER ===== */
+
+        /* ===== HEADER (#4a4a4a grey) ===== */
         .header {
             background: #4a4a4a;
-            padding: 15px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -42,151 +41,199 @@ $result = mysqli_query($conn, $query);
             top: 0; left: 0; right: 0;
             height: 60px;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
+        
         .logo {
             display: flex;
             align-items: center;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 800;
             color: white;
+            letter-spacing: 1px;
         }
+        
         .header-welcome {
-            color: white;
-            font-size: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
         }
 
-        /* ===== LAYOUT ===== */
+        /* ===== LAYOUT WRAPPER ===== */
         .wrapper {
             display: flex;
             margin-top: 60px;
         }
 
-        /* ===== SIDEBAR ===== */
+        /* ===== SIDEBAR (#5a5a5a grey) ===== */
         .sidebar {
             width: 240px;
             background: #5a5a5a;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             min-height: calc(100vh - 60px);
-            flex-shrink: 0;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            z-index: 90;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
         }
+        
         .sidebar a {
             display: flex;
             align-items: center;
-            padding: 15px 25px;
-            color: white;
+            padding: 14px 25px;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
         }
+        
         .sidebar a:hover, .sidebar a.active {
+            color: #fff;
             background: #7a7a7a;
         }
 
-        /* ===== CONTENT ===== */
+        /* ===== CONTENT PANEL ===== */
         .content {
             flex: 1;
-            padding: 30px;
+            margin-left: 240px;
+            padding: 35px 30px;
         }
 
-        /* ===== BOX ===== */
+        /* ===== BOX/CARDS ===== */
         .box {
-            background: #dcdcdc;
-            border: 1px solid #bbb;
-            border-radius: 10px;
-            padding: 25px;
+            background: rgba(45, 45, 45, 0.85); 
+            border: 1px solid rgba(120, 120, 120, 0.25);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
+
         .box h2 {
-            margin-bottom: 15px;
-            border-bottom: 2px solid #888;
-            padding-bottom: 8px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff8c00;
+            padding-bottom: 10px;
+            color: #fff;
         }
 
         /* ===== TABLE ===== */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            background: #f0f0f0;
+            margin-top: 15px;
         }
+        
         th, td {
-            border: 1px solid #bbb;
-            padding: 10px;
-            text-align: center;
+            padding: 16px 14px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 14px;
         }
+        
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
         th {
-            background: #5a5a5a;
-            color: white;
+            background: rgba(130, 124, 124, 0.4);
+            color: #ffcc00;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        tr:hover { background: #e0e0e0; }
 
-        /* ===== STATUS ===== */
-        .status-paid   { color: #2a7a2a; font-weight: bold; }
-        .status-unpaid { color: #aa2222; font-weight: bold; }
+        /* ===== STATUS LABELS ===== */
+        .status-paid    { color: #34d399; font-weight: bold; } /* Hijau terang emerald */
+        .status-unpaid  { color: #f87171; font-weight: bold; } /* Merah terang pastel */
+
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+        
+        a:hover {
+            color: #93c5fd;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
     <div class="header">
         <div class="logo">
-            <span style="font-size:32px; margin-right:10px;">🔧</span>
-            DRILLTECH
+            <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
         <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
     </div>
 
-    <!-- Wrapper -->
     <div class="wrapper">
 
-        <!-- Sidebar -->
         <div class="sidebar">
             <a href="admin.php">📊 DASHBOARD</a>
             <a href="projectAD.php">📁 PROJECT</a>
             <a href="employeeAD.php" class="active">👷 EMPLOYEE</a>
         </div>
 
-        <!-- Content -->
         <div class="content">
             <div class="box">
                 <h2>Employee List with Payroll</h2>
                 <table>
-                    <tr>
-                        <th>Employee ID</th>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Contact</th>
-                        <th>Payroll ID</th>
-                        <th>Amount (RM)</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Type</th>
-                    </tr>
-                    <?php
-                    // re-run query untuk pastikan data fresh
-                    $result2 = mysqli_query($conn, "SELECT e.Employee_ID, e.Employee_Name, e.Employee_Position, e.Employee_Contact,
-                                 pr.Payroll_ID, pr.Payroll_Amount, pr.Payroll_Status, pr.Payroll_Date, pr.Payroll_Type
-                          FROM employee e
-                          LEFT JOIN payroll pr ON e.Employee_ID = pr.Employee_ID
-                          ORDER BY e.Employee_ID, pr.Payroll_Date");
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Contact</th>
+                            <th>Payroll ID</th>
+                            <th>Amount (RM)</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $result2 = mysqli_query($conn, "SELECT e.Employee_ID, e.Employee_Name, e.Employee_Position, e.Employee_Contact,
+                                                                 pr.Payroll_ID, pr.Payroll_Amount, pr.Payroll_Status, pr.Payroll_Date, pr.Payroll_Type
+                                                          FROM employee e
+                                                          LEFT JOIN payroll pr ON e.Employee_ID = pr.Employee_ID
+                                                          ORDER BY e.Employee_ID, pr.Payroll_Date");
 
-                    if(mysqli_num_rows($result2) > 0){
-                        while($row = mysqli_fetch_assoc($result2)){
-                            $statusClass = ($row['Payroll_Status'] == "Paid") ? "status-paid" : "status-unpaid";
-                    ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($row['Employee_ID']); ?></td>
-                        <td><?php echo htmlspecialchars($row['Employee_Name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['Employee_Position']); ?></td>
-                        <td><?php echo htmlspecialchars($row['Employee_Contact']); ?></td>
-                        <td><?php echo htmlspecialchars($row['Payroll_ID'] ?? '-'); ?></td>
-                        <td>RM<?php echo number_format($row['Payroll_Amount'] ?? 0, 2); ?></td>
-                        <td class="<?php echo $statusClass; ?>"><?php echo $row['Payroll_Status'] ?? '-'; ?></td>
-                        <td><?php echo $row['Payroll_Date'] ?? '-'; ?></td>
-                        <td><?php echo htmlspecialchars($row['Payroll_Type'] ?? '-'); ?></td>
-                    </tr>
-                    <?php
+                        if(mysqli_num_rows($result2) > 0){
+                            while($row = mysqli_fetch_assoc($result2)){
+                                $statusClass = ($row['Payroll_Status'] == "Paid") ? "status-paid" : "status-unpaid";
+                        ?>
+                        <tr>
+                            <td>#<?php echo htmlspecialchars($row['Employee_ID']); ?></td>
+                            <td><?php echo htmlspecialchars($row['Employee_Name']); ?></td>
+                            <td><?php echo htmlspecialchars($row['Employee_Position']); ?></td>
+                            <td><?php echo htmlspecialchars($row['Employee_Contact']); ?></td>
+                            <td><?php echo $row['Payroll_ID'] ? "#".$row['Payroll_ID'] : '-'; ?></td>
+                            <td>RM <?php echo number_format($row['Payroll_Amount'] ?? 0, 2); ?></td>
+                            <td class="<?php echo $statusClass; ?>"><?php echo $row['Payroll_Status'] ?? '-'; ?></td>
+                            <td><?php echo $row['Payroll_Date'] ?? '-'; ?></td>
+                            <td><?php echo htmlspecialchars($row['Payroll_Type'] ?? '-'); ?></td>
+                        </tr>
+                        <?php
+                            }
+                        } else {
+                            echo "<tr><td colspan='9' style='text-align: center; color: #64748b; font-style: italic; border: none;'>No data found.</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='9'>No data found.</td></tr>";
-                    }
-                    ?>
+                        ?>
+                    </tbody>
                 </table>
             </div>
         </div>

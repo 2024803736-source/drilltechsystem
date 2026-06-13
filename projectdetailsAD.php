@@ -63,20 +63,22 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Detail - DrillTech Admin</title>
     <style>
+        /* Reset & Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), 
+        
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(rgba(74, 74, 74, 0.45), rgba(15, 15, 15, 0.95)), 
                         url('images/construction_bg.jpg') center/cover no-repeat fixed;
-            color: black;
+            color: #f8fafc;
             min-height: 100vh;
-            margin: 0;
         }
 
-        /* ===== HEADER ===== */
+        /* ===== HEADER (#4a4a4a grey) ===== */
         .header {
             background: #4a4a4a;
-            padding: 15px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -84,140 +86,215 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
             top: 0; left: 0; right: 0;
             height: 60px;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
+        
         .logo {
             display: flex;
             align-items: center;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 800;
             color: white;
+            letter-spacing: 1px;
         }
+        
         .header-welcome {
-            color: white;
-            font-size: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
         }
 
-        /* ===== LAYOUT ===== */
+        /* ===== LAYOUT WRAPPER ===== */
         .wrapper {
             display: flex;
             margin-top: 60px;
         }
 
-        /* ===== SIDEBAR ===== */
+        /* ===== SIDEBAR (#5a5a5a grey) ===== */
         .sidebar {
             width: 240px;
             background: #5a5a5a;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             min-height: calc(100vh - 60px);
-            flex-shrink: 0;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            z-index: 90;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
         }
+        
         .sidebar a {
             display: flex;
             align-items: center;
-            padding: 15px 25px;
-            color: white;
+            padding: 14px 25px;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
         }
+        
         .sidebar a:hover, .sidebar a.active {
+            color: #fff;
             background: #7a7a7a;
         }
 
-        /* ===== CONTENT ===== */
+        /* ===== CONTENT PANEL ===== */
         .content {
             flex: 1;
-            padding: 30px;
+            margin-left: 240px;
+            padding: 35px 30px;
         }
 
-        /* ===== BOX ===== */
-        .box {
-            background: #dcdcdc;
-            border: 1px solid #bbb;
-            border-radius: 10px;
-            padding: 25px;
+        /* ===== BOX/CARDS ===== */
+        .box, .form-box {
+            background: rgba(45, 45, 45, 0.85); 
+            border: 1px solid rgba(120, 120, 120, 0.25);
+            border-radius: 12px;
+            padding: 28px;
             margin-bottom: 25px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
-        .box h2 {
-            margin-bottom: 15px;
-            border-bottom: 2px solid #888;
+
+        .box h2, .form-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff8c00;
+            padding-bottom: 10px;
+            color: #fff;
+        }
+
+        .box p {
+            margin-bottom: 10px;
+            font-size: 15px;
+            color: #cbd5e1;
+        }
+
+        /* ===== FORM FIELDS ===== */
+        .form-box h3 {
+            margin: 25px 0 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             padding-bottom: 8px;
         }
-        .box p {
-            margin-bottom: 8px;
-            font-size: 15px;
-        }
-
-        /* ===== FORM ===== */
-        .form-box {
-            background: #dcdcdc;
-            border: 1px solid #bbb;
-            border-radius: 10px;
-            padding: 25px;
-        }
-        .form-box h3 {
-            margin: 20px 0 10px;
-            color: #333;
-            border-bottom: 1px solid #aaa;
-            padding-bottom: 5px;
-        }
+        
         .form-box label {
-            font-weight: bold;
+            font-weight: 600;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+        
         .form-box select {
-            padding: 8px 12px;
-            border-radius: 5px;
-            border: 1px solid #bbb;
-            background: #f0f0f0;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
             font-size: 14px;
             width: 100%;
             max-width: 350px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: all 0.3s;
         }
-        .form-box input[type="checkbox"] {
-            margin-right: 8px;
+
+        .form-box select:focus {
+            border-color: #888;
+            box-shadow: 0 0 0 3px rgba(120, 120, 120, 0.25);
         }
-        .checkbox-item {
-            margin-bottom: 6px;
-        }
-        .form-box button {
-            margin-top: 20px;
-            padding: 10px 25px;
-            background: #5a5a5a;
+
+        select option {
+            background-color: #282828;
             color: white;
-            border: none;
-            border-radius: 5px;
+        }
+
+        /* Checkboxes */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
             font-size: 15px;
+            color: #e2e8f0;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            accent-color: #ff8c00;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
-        .form-box button:hover {
-            background: #3a3a3a;
+
+        /* Input Text inside Table */
+        .form-box input[type="text"] {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            max-width: 180px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-box input[type="text"]:focus {
+            border-color: #888;
         }
 
         /* ===== TABLE ===== */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            background: #f0f0f0;
+            margin-top: 15px;
+            margin-bottom: 20px;
         }
+        
         th, td {
-            border: 1px solid #bbb;
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background: #5a5a5a;
-            color: white;
-        }
-        tr:hover { background: #e0e0e0; }
-
-        .form-box input[type="text"] {
-            padding: 6px 10px;
-            border-radius: 5px;
-            border: 1px solid #bbb;
-            background: #f0f0f0;
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             font-size: 14px;
-            width: 150px;
+        }
+        
+        th {
+            background: rgba(130, 124, 124, 0.4);
+            color: #ffcc00;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Save Button */
+        .form-box button {
+            margin-top: 20px;
+            padding: 14px 32px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        }
+
+        .form-box button:hover {
+            background: #218838;
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -226,7 +303,7 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
     <!-- Header -->
     <div class="header">
         <div class="logo">
-            <span style="font-size:32px; margin-right:10px;">🔧</span>
+            <span style="font-size: 24px; margin-right: 8px;">🔧</span>
             DRILLTECH
         </div>
         <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
@@ -248,9 +325,9 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
             <!-- Project Info -->
             <div class="box">
                 <h2>Project Detail</h2>
-                <p><b>PROJECT ID:</b> <?php echo htmlspecialchars($project['Project_ID']); ?></p>
+                <p><b>PROJECT ID:</b> #<?php echo htmlspecialchars($project['Project_ID']); ?></p>
                 <p><b>PROJECT NAME:</b> <?php echo htmlspecialchars($project['Project_Name']); ?></p>
-                <p><b>CLIENT:</b> <?php echo htmlspecialchars($project['Client_ID']); ?></p>
+                <p><b>CLIENT ID:</b> #<?php echo htmlspecialchars($project['Client_ID']); ?></p>
             </div>
 
             <!-- Form -->
@@ -260,7 +337,8 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                     <h3>Assign Employee by Position</h3>
 
                     <label>Site Engineer:</label>
-                    <select name="engineer">
+                    <select name="engineer" required>
+                        <option value="">-- Choose Engineer --</option>
                         <?php while($row = mysqli_fetch_assoc($engineers)){ ?>
                             <option value="<?php echo $row['Employee_ID']; ?>">
                                 <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
@@ -269,7 +347,8 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                     </select>
 
                     <label>Site Supervisor:</label>
-                    <select name="supervisor">
+                    <select name="supervisor" required>
+                        <option value="">-- Choose Supervisor --</option>
                         <?php while($row = mysqli_fetch_assoc($supervisors)){ ?>
                             <option value="<?php echo $row['Employee_ID']; ?>">
                                 <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
@@ -281,30 +360,34 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                     <?php while($row = mysqli_fetch_assoc($workers)){ ?>
                         <div class="checkbox-item">
                             <input type="checkbox" name="workers[]" value="<?php echo $row['Employee_ID']; ?>">
-                            <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
+                            <span><?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?></span>
                         </div>
                     <?php } ?>
 
                     <h3>Equipment Assignment</h3>
                     <table>
-                        <tr>
-                            <th>Equipment ID</th>
-                            <th>Equipment Name</th>
-                            <th>Duration / Unit</th>
-                        </tr>
-                        <?php while($eq = mysqli_fetch_assoc($equipments)){ ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($eq['Equipment_ID']); ?></td>
-                            <td><?php echo htmlspecialchars($eq['Equipment_Name']); ?></td>
-                            <td>
-                                <?php if(strtolower($eq['Equipment_Name']) == "pipeline"){ ?>
-                                    <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 80 unit">
-                                <?php } else { ?>
-                                    <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 30 days">
-                                <?php } ?>
-                            </td>
-                        </tr>
-                        <?php } ?>
+                        <thead>
+                            <tr>
+                                <th>Equipment ID</th>
+                                <th>Equipment Name</th>
+                                <th>Duration / Unit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($eq = mysqli_fetch_assoc($equipments)){ ?>
+                            <tr>
+                                <td>#<?php echo htmlspecialchars($eq['Equipment_ID']); ?></td>
+                                <td><?php echo htmlspecialchars($eq['Equipment_Name']); ?></td>
+                                <td>
+                                    <?php if(strtolower($eq['Equipment_Name']) == "pipeline"){ ?>
+                                        <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 80 unit">
+                                    <?php } else { ?>
+                                        <input type="text" name="duration[<?php echo $eq['Equipment_ID']; ?>]" placeholder="e.g. 30 days">
+                                    <?php } ?>
+                                </td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
                     </table>
 
                     <input type="hidden" name="project_id" value="<?php echo htmlspecialchars($project['Project_ID']); ?>">

@@ -27,155 +27,269 @@ $projects = mysqli_query($conn, "
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - DrillTech HDD</title>
     <style>
+        /* CSS Reset & Modern Typography */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), url('images/construction_bg.jpg') center/cover no-repeat fixed;
-            color: white;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* Blue-tinted construction background overlay */
+            background: linear-gradient(rgba(0, 48, 135, 0.45), rgba(15, 20, 30, 0.9)), 
+                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+            color: #f8fafc;
             min-height: 100vh;
         }
+
+        /* Top Header Navigation (#003087 blue) */
         .header {
             background: #003087;
-            padding: 15px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0 30px;
+            height: 64px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
-        .logo {
+        
+        .logo { 
+            font-size: 20px; 
+            font-weight: 800; 
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
-            font-size: 26px;
-            font-weight: bold;
+            gap: 8px;
         }
+
+        .user-welcome {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        /* Side Navigation Panel (#003087 blue) */
         .sidebar {
             width: 240px;
             background: #003087;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             position: fixed;
-            height: 100vh;
+            top: 64px;
+            left: 0;
+            height: calc(100vh - 64px);
             padding-top: 20px;
+            z-index: 90;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
         }
+        
         .sidebar a {
             display: flex;
             align-items: center;
-            padding: 15px 25px;
-            color: white;
+            padding: 14px 25px;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
             gap: 10px;
         }
-        .sidebar a:hover, .sidebar a.active {
+        
+        /* Sidebar Hover and Active (#ff8c00 orange) */
+        .sidebar a:hover { 
+            color: #fff;
             background: #ff8c00;
         }
+
+        .sidebar a.active { 
+            color: #fff;
+            background: #ff8c00; 
+        }
+
+        /* Main Content Layout */
         .content {
             margin-left: 260px;
-            padding: 30px;
+            padding: 94px 30px 40px 30px;
         }
-        .main-box {
-            background: rgba(0,0,0,0.8);
-            border-radius: 12px;
-            padding: 25px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-        th {
-            background: #002266;
-            color: #ffcc00;
-        }
-        .status {
-            padding: 6px 18px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            display: inline-block;
-        }
-        .status-ongoing { background: #28a745; color: white; }
-        .status-completed { background: #007bff; color: white; }
-        .status-pending { background: #ffc107; color: black; }
 
-        /* Centered Add Project Button */
+        /* Table Card Container */
+        .main-box {
+            background: rgba(0, 0, 0, 0.65); 
+            border: 1px solid rgba(0, 48, 135, 0.35);
+            border-radius: 12px; 
+            padding: 28px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .main-box h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff8c00;
+            padding-bottom: 10px;
+        }
+
+        /* Styled Table */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px; 
+        }
+        
+        th, td { 
+            padding: 16px 14px; 
+            text-align: left; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        th { 
+            background: rgba(0, 48, 135, 0.4); 
+            color: #ffcc00; 
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            display: inline-block;
+            text-transform: uppercase;
+        }
+        
+        .status-ongoing { 
+            background: rgba(0, 204, 102, 0.12); 
+            color: #00cc66; 
+            border: 1px solid rgba(0, 204, 102, 0.25); 
+        }
+        
+        .status-completed { 
+            background: rgba(51, 153, 255, 0.12); 
+            color: #3399ff; 
+            border: 1px solid rgba(51, 153, 255, 0.25); 
+        }
+        
+        .status-pending { 
+            background: rgba(255, 204, 0, 0.12); 
+            color: #ffcc00; 
+            border: 1px solid rgba(255, 204, 0, 0.25); 
+        }
+
+        /* Add Project Button Styling */
         .button-container {
             text-align: center;
             margin-top: 30px;
         }
+
+        .button-container a {
+            text-decoration: none;
+        }
+
         .add-project {
-            background: linear-gradient(135deg, #007bff, #00aaff);
+            background: linear-gradient(135deg, #ff8c00, #d97706);
             color: white;
             padding: 14px 32px;
             border: none;
-            border-radius: 50px;
-            font-size: 17px;
-            font-weight: bold;
+            border-radius: 8px; /* Consistent corners */
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.25);
+            transition: all 0.2s ease;
         }
+
         .add-project:hover {
-            background: linear-gradient(135deg, #0056b3, #0099ff);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.5);
+            background: linear-gradient(135deg, #ffa033, #d97706);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 140, 0, 0.4);
+        }
+
+        .add-project:active {
+            transform: translateY(1px);
         }
     </style>
 </head>
 <body>
+    <!-- Top Header Navigation -->
     <div class="header">
         <div class="logo">
-            <span style="font-size:32px;">🔧</span> DRILLTECH
+            <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div>Welcome, <?php echo htmlspecialchars($client_name); ?></div>
+        <div class="user-welcome">Welcome, <?php echo htmlspecialchars($client_name); ?></div>
     </div>
 
+    <!-- Side Navigation Bar -->
     <div class="sidebar">
         <a href="client.php">📊 DASHBOARD</a>
         <a href="projectCL.php" class="active">🔍 PROJECT</a>
         <a href="paymentCL.php">💰 PAYMENT</a>
     </div>
 
+    <!-- Main View Panel -->
     <div class="content">
         <div class="main-box">
             <h2>Projects:</h2>
             
             <table>
-                <tr>
-                    <th>Project ID</th>
-                    <th>Project Name</th>
-                    <th>Project Status</th>
-                    <th>Project Value</th>
-                    <th>Deadline</th>
-                </tr>
-                <?php while($row = mysqli_fetch_assoc($projects)): ?>
-                <tr>
-                    <td><?php echo $row['Project_ID']; ?></td>
-                    <td><?php echo htmlspecialchars($row['Project_Name']); ?></td>
-                    <td>
-                        <?php 
-                        $status = $row['Project_Status'];
-                        $class = ($status == 'On Going') ? 'status-ongoing' : 
-                                (($status == 'Completed') ? 'status-completed' : 'status-pending');
-                        echo "<span class='status $class'>$status</span>";
-                        ?>
-                    </td>
-                    <td>RM <?php echo number_format($row['Project_Value'], 2); ?></td>
-                    <td><?php echo $row['Deadline'] ?? 'N/A'; ?></td>
-                </tr>
-                <?php endwhile; ?>
+                <thead>
+                    <tr>
+                        <th>Project ID</th>
+                        <th>Project Name</th>
+                        <th>Project Status</th>
+                        <th>Project Value</th>
+                        <th>Deadline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while($row = mysqli_fetch_assoc($projects)): ?>
+                    <tr>
+                        <td><strong>#<?php echo $row['Project_ID']; ?></strong></td>
+                        <td><?php echo htmlspecialchars($row['Project_Name']); ?></td>
+                        <td>
+                            <?php 
+                            $status = $row['Project_Status'];
+                            $class = ($status == 'On Going' || $status == 'Ongoing') ? 'status-ongoing' : 
+                                    (($status == 'Completed') ? 'status-completed' : 'status-pending');
+                            echo "<span class='status $class'>$status</span>";
+                            ?>
+                        </td>
+                        <td>RM <?php echo number_format($row['Project_Value'], 2); ?></td>
+                        <td><?php echo !empty($row['Deadline']) ? htmlspecialchars($row['Deadline']) : 'N/A'; ?></td>
+                    </tr>
+                    <?php endwhile; ?>
+                    
+                    <?php if(mysqli_num_rows($projects) == 0): ?>
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #64748b; font-style: italic; border: none;">
+                                No projects request submitted.
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
             </table>
 
             <!-- Centered Button -->
-         <div class="button-container">
-         <a href="addProjectCL.php">
-        <button class="add-project">Add Project (+)</button>
-         </a>
-         </div>
+            <div class="button-container">
+                <a href="addProjectCL.php" class="add-project">Add Project Request (+)</a>
+            </div>
         </div>
     </div>
 </body>

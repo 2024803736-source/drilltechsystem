@@ -22,20 +22,23 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - DrillTech Admin</title>
     <style>
+        /* Reset & Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.65)), 
+        
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* Lighter grey-tinted background overlay to match client/employee themes */
+            background: linear-gradient(rgba(74, 74, 74, 0.45), rgba(15, 15, 15, 0.95)), 
                         url('images/construction_bg.jpg') center/cover no-repeat fixed;
-            color: black;
+            color: #f8fafc;
             min-height: 100vh;
-            margin: 0;
         }
 
-        /* ===== HEADER ===== */
+        /* ===== HEADER (#4a4a4a grey) ===== */
         .header {
             background: #4a4a4a;
-            padding: 15px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -43,148 +46,260 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             top: 0; left: 0; right: 0;
             height: 60px;
             z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
+        
         .logo {
             display: flex;
             align-items: center;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 800;
             color: white;
+            letter-spacing: 1px;
         }
+        
         .header-welcome {
-            color: white;
-            font-size: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
         }
 
-        /* ===== LAYOUT ===== */
+        /* ===== LAYOUT WRAPPER ===== */
         .wrapper {
             display: flex;
-            margin-top: 60px; /* tinggi header */
+            margin-top: 60px; /* height of header */
         }
 
-        /* ===== SIDEBAR ===== */
+        /* ===== SIDEBAR (#5a5a5a grey) ===== */
         .sidebar {
             width: 240px;
             background: #5a5a5a;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             min-height: calc(100vh - 60px);
-            flex-shrink: 0;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            z-index: 90;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
         }
+        
         .sidebar a {
             display: flex;
             align-items: center;
-            padding: 15px 25px;
-            color: white;
+            padding: 14px 25px;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
         }
+        
+        /* Sidebar Hover and Active (#7a7a7a grey) */
         .sidebar a:hover, .sidebar a.active {
+            color: #fff;
             background: #7a7a7a;
         }
 
-        /* ===== CONTENT ===== */
+        /* ===== CONTENT PANEL ===== */
         .content {
             flex: 1;
-            padding: 30px;
+            margin-left: 240px; /* sidebar offset */
+            padding: 35px 30px;
         }
+        
         .welcome {
-            font-size: 28px;
+            font-size: 26px;
+            font-weight: 700;
             margin-bottom: 25px;
-            color: #fdf7f7;
+            letter-spacing: 0.5px;
+            color: #fff;
         }
 
-        /* ===== STAT CARDS ===== */
+        /* ===== STAT CARDS FLEX GRID ===== */
         .stats {
             display: flex;
             gap: 20px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
+        
         .stat-card {
             flex: 1;
-            background: #dcdcdc;
-            border: 1px solid #bbb;
-            padding: 20px;
-            border-radius: 10px;
+            min-width: 200px;
+            background: rgba(45, 45, 45, 0.85); /* Semi-transparent modern dark grey background */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            border-radius: 12px;
             text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .stat-number {
-            font-size: 42px;
-            font-weight: bold;
-            margin: 8px 0;
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.25);
         }
 
-        /* ===== RECENT UPDATES ===== */
+        .stat-card div:first-child {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-number {
+            font-size: 38px;
+            font-weight: 800;
+            margin: 6px 0;
+        }
+        
+        .stat-card small {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* ===== RECENT UPDATES CARD ===== */
         .recent-updates {
-            background: #dcdcdc;
-            border: 1px solid #bbb;
-            padding: 25px;
-            border-radius: 10px;
+            background: rgba(45, 45, 45, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
+        
         .recent-updates h3 {
-            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
             border-bottom: 2px solid #888;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
+            letter-spacing: 0.5px;
+            color: #fff;
         }
+
+        .recent-updates ul {
+            list-style: none;
+        }
+
+        .recent-updates li {
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #ff8c00; /* industrial orange accent line */
+            border-radius: 0 6px 6px 0;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recent-updates li:last-child {
+            margin-bottom: 0;
+        }
+
+        .project-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .project-status {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Status colors */
+        .status-pending { background: rgba(255, 204, 0, 0.12); color: #ffcc00; border: 1px solid rgba(255, 204, 0, 0.25); }
+        .status-ongoing { background: rgba(0, 204, 102, 0.12); color: #00cc66; border: 1px solid rgba(0, 204, 102, 0.25); }
+        .status-completed { background: rgba(51, 153, 255, 0.12); color: #3399ff; border: 1px solid rgba(51, 153, 255, 0.25); }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <div class="header">
+    <!-- Header Navigation -->
+<div class="header">
         <div class="logo">
-            <span style="font-size:32px; margin-right:10px;">🔧</span>
-            DRILLTECH
+            <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
         <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
     </div>
 
-    <!-- Wrapper -->
+    <!-- Layout Wrapper -->
     <div class="wrapper">
 
-        <!-- Sidebar -->
+        <!-- Sidebar Navigation -->
         <div class="sidebar">
             <a href="admin.php" class="active">📊 DASHBOARD</a>
             <a href="projectAD.php">📁 PROJECT</a>
             <a href="employeeAD.php">👷 EMPLOYEE</a>
         </div>
 
-        <!-- Content -->
+        <!-- Content Area -->
         <div class="content">
             <h1 class="welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></h1>
 
+            <!-- Statistics Grid -->
             <div class="stats">
                 <div class="stat-card">
                     <div>TOTAL PROJECTS</div>
-                    <div class="stat-number" style="color:#555;"><?php echo $totalProjects; ?></div>
+                    <div class="stat-number" style="color: #e2e8f0;"><?php echo $totalProjects; ?></div>
                     <small>All Projects</small>
                 </div>
                 <div class="stat-card">
                     <div>TOTAL REVENUE</div>
-                    <div class="stat-number" style="color:#2a7a2a;">RM<?php echo number_format($totalRevenue, 2); ?></div>
+                    <div class="stat-number" style="color: #34d399;">RM<?php echo number_format($totalRevenue, 2); ?></div>
                     <small>Overall Income</small>
                 </div>
                 <div class="stat-card">
                     <div>PAYROLL SUMMARY</div>
-                    <div class="stat-number" style="color:#7a2a2a;">RM<?php echo number_format($payrollSummary, 2); ?></div>
+                    <div class="stat-number" style="color: #f87171;">RM<?php echo number_format($payrollSummary, 2); ?></div>
                     <small>Total Payroll</small>
                 </div>
                 <div class="stat-card">
                     <div>ACTIVE PROJECTS</div>
-                    <div class="stat-number" style="color:#2a2a7a;"><?php echo $activeClients; ?></div>
+                    <div class="stat-number" style="color: #60a5fa;"><?php echo $activeClients; ?></div>
                     <small>On Going Projects</small>
                 </div>
             </div>
 
+            <!-- Recent Projects Activity -->
             <div class="recent-updates">
                 <h3>Recent Updates:</h3>
-                <ul style="list-style: none;">
+                <ul>
                     <?php
                     $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project ORDER BY Project_ID DESC LIMIT 4");
                     while($row = mysqli_fetch_assoc($recent)):
+                        $status = strtolower(trim($row['Project_Status']));
+                        $statusClass = 'status-pending'; // default
+                        
+                        if ($status === 'on going' || $status === 'ongoing' || $status === 'active') {
+                            $statusClass = 'status-ongoing';
+                        } elseif ($status === 'completed' || $status === 'done') {
+                            $statusClass = 'status-completed';
+                        }
                     ?>
-                        <li style="margin: 12px 0;">
-                            ► <strong><?php echo htmlspecialchars($row['Project_Name']); ?></strong>
-                            - <?php echo $row['Project_Status']; ?>
+                        <li>
+                            <span class="project-name">► <?php echo htmlspecialchars($row['Project_Name']); ?></span>
+                            <span class="project-status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($row['Project_Status']); ?></span>
                         </li>
                     <?php endwhile; ?>
+                    
+                    <?php if(mysqli_num_rows($recent) == 0): ?>
+                        <li style="border-left: none; color: #64748b; font-style: italic; text-align: center; display: block; padding: 16px;">
+                            No updates available.
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
