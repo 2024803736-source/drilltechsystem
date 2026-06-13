@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 04, 2026 at 04:00 AM
+-- Generation Time: Jun 13, 2026 at 11:04 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -60,29 +60,40 @@ CREATE TABLE `assigned_employee` (
 
 INSERT INTO `assigned_employee` (`Project_ID`, `Employee_ID`, `ProjectEmp_StartD`, `ProjectEmp_EndD`) VALUES
 (1, 1, '2026-06-01', '2026-06-30'),
-(1, 2, '2026-06-01', '2026-06-30'),
-(1, 3, '2026-06-01', '2026-06-30'),
 (1, 4, '2026-06-01', '2026-06-30'),
-(1, 5, '2026-06-01', '2026-06-30'),
-(1, 6, '2026-06-01', '2026-06-30'),
 (1, 7, '2026-06-01', '2026-06-30'),
 (1, 8, '2026-06-01', '2026-06-30'),
+(1, 9, '2026-06-01', '2026-06-30'),
+(1, 10, '2026-06-01', '2026-06-30'),
+(1, 11, '2026-06-01', '2026-06-30'),
+(2, 2, '2026-01-15', '2026-02-15'),
+(2, 5, '2026-01-15', '2026-02-15'),
+(2, 12, '2026-01-15', '2026-02-15'),
+(2, 13, '2026-01-15', '2026-02-15'),
+(2, 14, '2026-01-15', '2026-02-15'),
+(2, 15, '2026-01-15', '2026-02-15'),
+(2, 16, '2026-01-15', '2026-02-15'),
+(3, 3, '2026-06-01', '2026-06-30'),
+(3, 6, '2026-06-01', '2026-06-30'),
+(3, 7, '2026-06-01', '2026-06-30'),
 (3, 9, '2026-06-01', '2026-06-30'),
-(3, 10, '2026-06-01', '2026-06-30'),
 (3, 11, '2026-06-01', '2026-06-30'),
-(3, 12, '2026-06-01', '2026-06-30'),
 (3, 13, '2026-06-01', '2026-06-30'),
-(3, 14, '2026-06-01', '2026-06-30'),
-(3, 15, '2026-06-01', '2026-06-30'),
-(3, 16, '2026-06-01', '2026-06-30'),
+(3, 17, '2026-06-01', '2026-06-30'),
 (5, 1, '2026-06-01', '2026-06-30'),
-(5, 2, '2026-06-01', '2026-06-30'),
-(5, 3, '2026-06-01', '2026-06-30'),
-(5, 4, '2026-06-01', '2026-06-30'),
-(5, 17, '2026-06-01', '2026-06-30'),
+(5, 5, '2026-06-01', '2026-06-30'),
+(5, 8, '2026-06-01', '2026-06-30'),
+(5, 10, '2026-06-01', '2026-06-30'),
+(5, 12, '2026-06-01', '2026-06-30'),
+(5, 14, '2026-06-01', '2026-06-30'),
 (5, 18, '2026-06-01', '2026-06-30'),
-(5, 19, '2026-06-01', '2026-06-30'),
-(5, 20, '2026-06-01', '2026-06-30');
+(6, 2, '2026-03-01', '2026-03-31'),
+(6, 6, '2026-03-01', '2026-03-31'),
+(6, 15, '2026-03-01', '2026-03-31'),
+(6, 16, '2026-03-01', '2026-03-31'),
+(6, 17, '2026-03-01', '2026-03-31'),
+(6, 19, '2026-03-01', '2026-03-31'),
+(6, 20, '2026-03-01', '2026-03-31');
 
 -- --------------------------------------------------------
 
@@ -127,14 +138,14 @@ CREATE TABLE `employee` (
 --
 
 INSERT INTO `employee` (`Employee_ID`, `Employee_Name`, `Employee_Contact`, `Employee_Gender`, `Employee_Position`, `Employee_Address`) VALUES
-(1, 'Abu Hakimi', '0139876543', 'Male', 'Site Engineer', 'Seremban'),
+(1, 'Nadhir Nasaar', '0139876543', 'Male', 'Site Engineer', 'Kelantan'),
 (2, 'Ahmad Mateen', '0157788990', 'Male', 'Site Engineer', 'KL'),
-(3, 'Muhd Amiryul', '0192233445', 'Male', 'Site Engineer', 'Penang'),
+(3, 'Muhd Amiryul', '01156502124', 'Male', 'Site Engineer', 'Penang'),
 (4, 'Nur Aisyah', '0123344556', 'Female', 'Site Supervisor', 'KL'),
 (5, 'Daniel Hakim', '0189988776', 'Male', 'Site Supervisor', 'Johor'),
 (6, 'Sabrina Kamila', '0172233445', 'Female', 'Site Supervisor', 'Melaka'),
-(7, 'Khairul Danish', '0113344556', 'Male', 'General Worker', 'Selangor'),
-(8, 'Muhd Uzair', '0146677889', 'Male', 'General Worker', 'Kelantan'),
+(7, 'Khairul Danish', '0113344556', 'Male', 'General Worker', 'Kelantan'),
+(8, 'Muhd Uzair', '0146677889', 'Male', 'General Worker', 'Perak'),
 (9, 'Nur Faizah', '0135566778', 'Female', 'General Worker', 'Perak'),
 (10, 'Johan Jasli', '0167788990', 'Male', 'General Worker', 'Negeri Sembilan'),
 (11, 'Muhd Hamid', '0124455667', 'Male', 'General Worker', 'Negeri Sembilan'),
@@ -144,7 +155,7 @@ INSERT INTO `employee` (`Employee_ID`, `Employee_Name`, `Employee_Contact`, `Emp
 (15, 'Hakim Fateeh', '0135566778', 'Male', 'General Worker', 'Perak'),
 (16, 'Adam Nabeel', '0124455667', 'Male', 'General Worker', 'Negeri Sembilan'),
 (17, 'Khairul Hakim', '0146677889', 'Male', 'General Worker', 'Kelantan'),
-(18, 'Nadhir Nasar', '0113344556', 'Male', 'General Worker', 'Selangor'),
+(18, 'Johari ', '0113344556', 'Male', 'General Worker', 'Selangor'),
 (19, 'Muhd Zafry', '0157788990', 'Male', 'General Worker', 'KL'),
 (20, 'Amirul Danish', '0192233445', 'Male', 'General Worker', 'Penang');
 
@@ -191,6 +202,10 @@ INSERT INTO `equipment_usage` (`Project_ID`, `Equipment_ID`, `Equipment_Duration
 (1, 2, '20 days'),
 (1, 3, '15 days'),
 (1, 4, '80 unit'),
+(2, 1, '25 days'),
+(2, 2, '30 days'),
+(2, 3, '20 days'),
+(2, 4, '100 unit'),
 (3, 1, '25 days'),
 (3, 2, '30 days'),
 (3, 3, '20 days'),
@@ -198,7 +213,9 @@ INSERT INTO `equipment_usage` (`Project_ID`, `Equipment_ID`, `Equipment_Duration
 (5, 1, '40 days'),
 (5, 2, '35 days'),
 (5, 3, '25 days'),
-(5, 4, '50 unit');
+(5, 4, '50 unit'),
+(6, 1, '30 days'),
+(6, 2, '30 days');
 
 -- --------------------------------------------------------
 
