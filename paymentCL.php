@@ -10,7 +10,6 @@ if(!isset($_SESSION['client_id'])){
 $client_id = $_SESSION['client_id'];
 $client_name = $_SESSION['client_name'];
 
-// Fetch all payments
 $payments = mysqli_query($conn, "
     SELECT p.*, pr.Project_Name, pr.Project_ID as ProjID 
     FROM payment p 
@@ -26,19 +25,16 @@ $payments = mysqli_query($conn, "
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments - DrillTech HDD</title>
     <style>
-        /* CSS Reset & Modern Typography */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Blue-tinted construction background overlay */
             background: linear-gradient(rgba(0, 48, 135, 0.45), rgba(15, 20, 30, 0.9)), 
                         url('images/construction_bg.jpg') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
 
-        /* Top Header Navigation (#003087 blue) */
         .header {
             background: #003087;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -48,20 +44,9 @@ $payments = mysqli_query($conn, "
             align-items: center;
             justify-content: space-between;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 100;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .logo { 
-            font-size: 20px; 
-            font-weight: 800; 
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .user-welcome {
@@ -74,14 +59,12 @@ $payments = mysqli_query($conn, "
             border-radius: 20px;
         }
 
-        /* Side Navigation Panel (#003087 blue) */
         .sidebar {
             width: 240px;
             background: #003087;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             position: fixed;
-            top: 64px;
-            left: 0;
+            top: 64px; left: 0;
             height: calc(100vh - 64px);
             padding-top: 20px;
             z-index: 90;
@@ -101,24 +84,16 @@ $payments = mysqli_query($conn, "
             gap: 10px;
         }
         
-        /* Sidebar Hover and Active (#ff8c00 orange) */
-        .sidebar a:hover { 
-            color: #fff;
-            background: #ff8c00;
-        }
-
-        .sidebar a.active { 
+        .sidebar a:hover, .sidebar a.active { 
             color: #fff;
             background: #ff8c00; 
         }
 
-        /* Main Content Layout */
         .content {
             margin-left: 260px;
             padding: 94px 30px 40px 30px;
         }
 
-        /* Table Card Container */
         .main-box {
             background: rgba(0, 0, 0, 0.65); 
             border: 1px solid rgba(0, 48, 135, 0.35);
@@ -136,7 +111,6 @@ $payments = mysqli_query($conn, "
             padding-bottom: 10px;
         }
 
-        /* Styled Table */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -150,9 +124,7 @@ $payments = mysqli_query($conn, "
             font-size: 14px;
         }
 
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
-        }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
         
         th { 
             background: rgba(0, 48, 135, 0.4); 
@@ -163,11 +135,8 @@ $payments = mysqli_query($conn, "
             letter-spacing: 0.5px;
         }
 
-        /* Status Badges */
-        .status-completed { 
-            background: rgba(0, 204, 102, 0.12); 
-            color: #00cc66; 
-            border: 1px solid rgba(0, 204, 102, 0.25); 
+        /* Status Badges disamakan dengan projectCL.php */
+        .status {
             padding: 5px 12px; 
             border-radius: 20px; 
             font-size: 12px; 
@@ -176,19 +145,24 @@ $payments = mysqli_query($conn, "
             text-transform: uppercase;
         }
         
+        .status-ongoing { 
+            background: rgba(0, 204, 102, 0.12); 
+            color: #00cc66; 
+            border: 1px solid rgba(0, 204, 102, 0.25); 
+        }
+        
+        .status-completed { 
+            background: rgba(51, 153, 255, 0.12); 
+            color: #3399ff; 
+            border: 1px solid rgba(51, 153, 255, 0.25); 
+        }
+        
         .status-pending { 
             background: rgba(255, 204, 0, 0.12); 
             color: #ffcc00; 
             border: 1px solid rgba(255, 204, 0, 0.25); 
-            padding: 5px 12px; 
-            border-radius: 20px; 
-            font-size: 12px; 
-            font-weight: 700; 
-            display: inline-block;
-            text-transform: uppercase;
         }
 
-        /* Download Receipt Button */
         .btn-download {
             background: rgba(0, 204, 102, 0.12);
             color: #00cc66;
@@ -201,36 +175,25 @@ $payments = mysqli_query($conn, "
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s ease;
         }
 
         .btn-download:hover {
             background: #00cc66;
             color: white;
-            box-shadow: 0 4px 10px rgba(0, 204, 102, 0.25);
-            transform: translateY(-1px);
         }
 
-        /* Actions Button Section */
-        .action-buttons {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .action-buttons a {
-            text-decoration: none;
-        }
+        .action-buttons { text-align: center; margin-top: 30px; }
 
         .btn-make {
             background: linear-gradient(135deg, #ff8c00, #d97706);
             color: white;
             padding: 14px 32px;
             border: none;
-            border-radius: 8px; /* Consistent rounded corners */
+            border-radius: 8px;
             font-size: 15px;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
             box-shadow: 0 4px 12px rgba(255, 140, 0, 0.25);
             transition: all 0.2s ease;
         }
@@ -244,10 +207,21 @@ $payments = mysqli_query($conn, "
         .btn-make:active {
             transform: translateY(1px);
         }
+
+        .success-flash {
+            background: rgba(40, 167, 69, 0.15);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            color: #2ecc71;
+            padding: 14px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
-    <!-- Top Header Navigation -->
     <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
@@ -255,17 +229,22 @@ $payments = mysqli_query($conn, "
         <div class="user-welcome">Welcome, <?php echo htmlspecialchars($client_name); ?></div>
     </div>
 
-    <!-- Side Navigation Bar -->
     <div class="sidebar">
         <a href="client.php">📊 DASHBOARD</a>
         <a href="projectCL.php">🔍 PROJECT</a>
         <a href="paymentCL.php" class="active">💰 PAYMENT</a>
     </div>
 
-    <!-- Main View Panel -->
     <div class="content">
         <div class="main-box">
             <h2>Payment History</h2>
+            
+            <?php if(isset($_SESSION['payment_success'])): ?>
+                <div class="success-flash">
+                    🎉 <?php echo $_SESSION['payment_success']; ?>
+                    <?php unset($_SESSION['payment_success']); ?>
+                </div>
+            <?php endif; ?>
             
             <table>
                 <thead>
@@ -286,11 +265,13 @@ $payments = mysqli_query($conn, "
                         <td>#<?php echo $row['ProjID']; ?></td>
                         <td><?php echo htmlspecialchars($row['Project_Name']); ?></td>
                         <td>
-                            <?php if($row['Payment_Status'] == 'Completed'): ?>
-                                <span class="status-completed">Completed</span>
-                            <?php else: ?>
-                                <span class="status-pending">Pending</span>
-                            <?php endif; ?>
+                            <?php 
+                            $status = $row['Payment_Status'];
+                            // Logik pertukaran warna lencana mengikut data string database
+                            $class = ($status == 'On Going' || $status == 'Ongoing') ? 'status-ongoing' : 
+                                    (($status == 'Completed') ? 'status-completed' : 'status-pending');
+                            echo "<span class='status $class'>$status</span>";
+                            ?>
                         </td>
                         <td><?php echo htmlspecialchars($row['Payment_Date']); ?></td>
                         <td><?php echo htmlspecialchars($row['Payment_Method']); ?></td>
@@ -312,9 +293,8 @@ $payments = mysqli_query($conn, "
                 </tbody>
             </table>
 
-            <!-- Make Payment Button -->
             <div class="action-buttons">
-                <a href="makePaymentCL.php" class="btn-make">💳 Make New Payment</a>
+                <a href="makePaymentCL.php" class="btn-make">Make New Payment</a>
             </div>
         </div>
     </div>

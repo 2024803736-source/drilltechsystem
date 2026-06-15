@@ -26,7 +26,6 @@ if(!$row){
     die("<h2 style='color:red;text-align:center;margin-top:50px;'>Receipt not found or you don't have access.</h2>");
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,7 +52,7 @@ if(!$row){
              border-bottom: 4px solid #003087; 
              padding-bottom: 20px; 
              margin-bottom: 30px;
-             }
+        }
         .logo { 
             font-size: 36px;
             color: #003087; 
@@ -62,12 +61,13 @@ if(!$row){
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            margin: 20px 0; }
+            margin: 20px 0; 
+        }
         th, td {
              padding: 12px 15px; 
              text-align: left; 
              border-bottom: 1px solid #ddd;
-             }
+        }
         th { 
             background: #003087; 
             color: white; 
@@ -76,14 +76,15 @@ if(!$row){
             font-size: 22px; 
             font-weight: bold; 
             text-align: right;
-             margin-top: 30px; 
-             color: #003087;
-             }
-        .footer { text-align: center;
-         margin-top: 50px; 
-         color: #666; 
-         font-size: 14px;
-         }
+            margin-top: 30px; 
+            color: #003087;
+        }
+        .footer { 
+            text-align: center;
+            margin-top: 50px; 
+            color: #666; 
+            font-size: 14px;
+        }
         .print-btn { 
             padding: 12px 30px; 
             background: #28a745; 
@@ -114,7 +115,7 @@ if(!$row){
         </table>
 
         <div class="total">
-            Amount Paid: RM <?php echo number_format($row['Project_Value'] * 0.25, 2); ?> 
+            Amount Paid: RM <?php echo number_format($row['Project_Value'], 2); ?> 
         </div>
 
         <div class="footer">

@@ -13,19 +13,32 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
 // Kalau form disubmit
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $projectID = $_POST['project_id'];
+    
+    // Ambil data tarikh kalendar dari form
+    $startDate = $_POST['start_date'];
+    $endDate = $_POST['end_date'];
 
     $engineer = $_POST['engineer'];
     $supervisor = $_POST['supervisor'];
     $workers = isset($_POST['workers']) ? $_POST['workers'] : [];
 
+    // === LANGKAH KESELAMATAN: Padam rekod lama dulu untuk elak Duplicate Entry ===
+    mysqli_query($conn, "DELETE FROM assigned_employee WHERE Project_ID = '$projectID'");
+    mysqli_query($conn, "DELETE FROM equipment_usage WHERE Project_ID = '$projectID'");
+
+    // Masukkan Engineer dan Supervisor baru sekali dengan tarikh projek mereka
     $employees = [$engineer, $supervisor];
     foreach($employees as $emp){
         if(!empty($emp)){
-            mysqli_query($conn, "INSERT INTO assigned_employee (Project_ID, Employee_ID) VALUES ('$projectID','$emp')");
+            mysqli_query($conn, "INSERT INTO assigned_employee (Project_ID, Employee_ID, ProjectEmp_StartD, ProjectEmp_EndD) VALUES ('$projectID', '$emp', '$startDate', '$endDate')");
         }
     }
+    
+    // Masukkan senarai General Workers baru sekali dengan tarikh projek mereka
     foreach($workers as $w){
-        mysqli_query($conn, "INSERT INTO assigned_employee (Project_ID, Employee_ID) VALUES ('$projectID','$w')");
+        if(!empty($w)){
+            mysqli_query($conn, "INSERT INTO assigned_employee (Project_ID, Employee_ID, ProjectEmp_StartD, ProjectEmp_EndD) VALUES ('$projectID', '$w', '$startDate', '$endDate')");
+        }
     }
 
     if(isset($_POST['duration'])){
@@ -36,6 +49,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         }
     }
 
+    // Ubah status project sahaja (Tanpa usik kolum tarikh di table project)
     mysqli_query($conn, "UPDATE project SET Project_Status='On Going' WHERE Project_ID='$projectID'");
 
     header("Location: projectAD.php");
@@ -194,7 +208,7 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
             letter-spacing: 0.5px;
         }
         
-        .form-box select {
+        .form-box select, .form-box input[type="date"] {
             padding: 12px 14px;
             border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -208,14 +222,27 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
             transition: all 0.3s;
         }
 
-        .form-box select:focus {
-            border-color: #888;
-            box-shadow: 0 0 0 3px rgba(120, 120, 120, 0.25);
+        .form-box select:focus, .form-box input[type="date"]:focus {
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.25);
         }
 
         select option {
             background-color: #282828;
             color: white;
+        }
+
+        /* Container susunan kalendar sebelah-menyebelah */
+        .date-range-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .date-field {
+            flex: 1;
+            min-width: 160px;
+            max-width: 250px;
         }
 
         /* Checkboxes */
@@ -300,7 +327,6 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
 </head>
 <body>
 
-    <!-- Header -->
     <div class="header">
         <div class="logo">
             <span style="font-size: 24px; margin-right: 8px;">🔧</span>
@@ -309,20 +335,16 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
         <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
     </div>
 
-    <!-- Wrapper -->
     <div class="wrapper">
 
-        <!-- Sidebar -->
         <div class="sidebar">
             <a href="admin.php">📊 DASHBOARD</a>
             <a href="projectAD.php" class="active">📁 PROJECT</a>
             <a href="employeeAD.php">👷 EMPLOYEE</a>
         </div>
 
-        <!-- Content -->
         <div class="content">
 
-            <!-- Project Info -->
             <div class="box">
                 <h2>Project Detail</h2>
                 <p><b>PROJECT ID:</b> #<?php echo htmlspecialchars($project['Project_ID']); ?></p>
@@ -330,16 +352,29 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                 <p><b>CLIENT ID:</b> #<?php echo htmlspecialchars($project['Client_ID']); ?></p>
             </div>
 
-            <!-- Form -->
             <div class="form-box">
                 <form method="post">
+
+                    <h3>Employee Assignment Timeline</h3>
+                    <div class="date-range-container">
+                        <div class="date-field">
+                            <label for="start_date">Start Date:</label>
+                            <input type="date" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="date-field">
+                            <label for="end_date">End Date:</label>
+                            <input type="date" id="end_date" name="end_date" required>
+                        </div>
+                    </div>
 
                     <h3>Assign Employee by Position</h3>
 
                     <label>Site Engineer:</label>
                     <select name="engineer" required>
                         <option value="">-- Choose Engineer --</option>
-                        <?php while($row = mysqli_fetch_assoc($engineers)){ ?>
+                        <?php 
+                        mysqli_data_seek($engineers, 0); // Reset pointer
+                        while($row = mysqli_fetch_assoc($engineers)){ ?>
                             <option value="<?php echo $row['Employee_ID']; ?>">
                                 <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
                             </option>
@@ -349,7 +384,9 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                     <label>Site Supervisor:</label>
                     <select name="supervisor" required>
                         <option value="">-- Choose Supervisor --</option>
-                        <?php while($row = mysqli_fetch_assoc($supervisors)){ ?>
+                        <?php 
+                        mysqli_data_seek($supervisors, 0); // Reset pointer
+                        while($row = mysqli_fetch_assoc($supervisors)){ ?>
                             <option value="<?php echo $row['Employee_ID']; ?>">
                                 <?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?>
                             </option>
@@ -357,7 +394,9 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                     </select>
 
                     <label>General Worker (pilih max 5):</label>
-                    <?php while($row = mysqli_fetch_assoc($workers)){ ?>
+                    <?php 
+                    mysqli_data_seek($workers, 0); // Reset pointer
+                    while($row = mysqli_fetch_assoc($workers)){ ?>
                         <div class="checkbox-item">
                             <input type="checkbox" name="workers[]" value="<?php echo $row['Employee_ID']; ?>">
                             <span><?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?></span>
@@ -374,7 +413,9 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while($eq = mysqli_fetch_assoc($equipments)){ ?>
+                            <?php 
+                            mysqli_data_seek($equipments, 0); // Reset pointer
+                            while($eq = mysqli_fetch_assoc($equipments)){ ?>
                             <tr>
                                 <td>#<?php echo htmlspecialchars($eq['Equipment_ID']); ?></td>
                                 <td><?php echo htmlspecialchars($eq['Equipment_Name']); ?></td>
