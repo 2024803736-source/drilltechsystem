@@ -182,10 +182,28 @@ $result = mysqli_query($conn, "SELECT * FROM payroll WHERE Employee_ID='$employe
             color: #ffcc00; 
             border: 1px solid rgba(255, 204, 0, 0.25); 
         }
+
+        /* Action Slip Button style */
+        .btn-slip {
+            background: #ff8c00;
+            color: white;
+            padding: 6px 14px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-slip:hover {
+            background: #e07b00;
+            box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
+        }
     </style>
 </head>
 <body>
-    <!-- Top Header Navigation -->
     <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
@@ -193,7 +211,6 @@ $result = mysqli_query($conn, "SELECT * FROM payroll WHERE Employee_ID='$employe
         <div class="user-welcome">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></div>
     </div>
 
-    <!-- Side Navigation Bar -->
     <div class="sidebar">
         <a href="employee.php">📊 DASHBOARD</a>
         <a href="projectEM.php">🔍 PROJECT</a>
@@ -201,7 +218,6 @@ $result = mysqli_query($conn, "SELECT * FROM payroll WHERE Employee_ID='$employe
         <a href="payrollEM.php" class="active">💰 PAYROLL</a>
     </div>
 
-    <!-- Main View Panel -->
     <div class="content">
         <div class="main-box">
             <h2>Payroll Management Dashboard</h2>
@@ -213,6 +229,7 @@ $result = mysqli_query($conn, "SELECT * FROM payroll WHERE Employee_ID='$employe
                         <th>Payroll Date</th>
                         <th>Payroll Amount</th>
                         <th>Payroll Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -237,12 +254,17 @@ $result = mysqli_query($conn, "SELECT * FROM payroll WHERE Employee_ID='$employe
                                 <?php echo htmlspecialchars($row['Payroll_Status']); ?>
                             </span>
                         </td>
+                        <td>
+                            <a href="generateslipEM.php?id=<?php echo $row['Payroll_ID']; ?>" target="_blank" class="btn-slip">
+                                📄 View Slip
+                            </a>
+                        </td>
                     </tr>
                     <?php endwhile; ?>
                     
                     <?php if(mysqli_num_rows($result) == 0): ?>
                         <tr>
-                            <td colspan="5" style="text-align: center; color: #64748b; font-style: italic; border: none;">
+                            <td colspan="6" style="text-align: center; color: #64748b; font-style: italic; border: none;">
                                 No payroll records found.
                             </td>
                         </tr>
