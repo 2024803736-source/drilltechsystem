@@ -9,6 +9,24 @@ if(!isset($_SESSION['admin_id'])){
 include("database.php");
 
 $admin_name = $_SESSION['admin_name'] ?? 'Admin';
+
+// ==========================================
+// LOGIK UNTUK TUKAR STATUS PROJEK KE COMPLETED
+// ==========================================
+if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['project_id'])) {
+    $projectID = mysqli_real_escape_string($conn, $_GET['project_id']);
+    
+    // Kemaskini status projek dalam database
+    $updateQuery = "UPDATE project SET Project_Status = 'Completed' WHERE Project_ID = '$projectID'";
+    
+    if (mysqli_query($conn, $updateQuery)) {
+        // Berjaya kemaskini, refresh halaman tanpa parameter GET
+        header("Location: projectAD.php");
+        exit();
+    } else {
+        echo "<script>alert('Gagal mengemas kini status projek.');</script>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -155,15 +173,14 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
         }
 
         /* ===== STATUS LABELS & BUTTONS ===== */
-        .status-ongoing   { color: #60a5fa; font-weight: bold; }
         .status-completed { color: #34d399; font-weight: bold; }
         
-        /* Rekabentuk Butang Active Pending yang Official */
+        /* Rekabentuk Butang Pending (Kuning Asal) */
         .btn-pending-active { 
             display: inline-block;
             padding: 6px 16px;
-            background: #ffcc00; /* Warna kuning asal tema */
-            color: #1e1e1e !important; /* Tulisan gelap supaya kontras tinggi */
+            background: #ffcc00; 
+            color: #1e1e1e !important; 
             font-weight: 700; 
             font-size: 12px;
             text-transform: uppercase;
@@ -178,7 +195,30 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
         .btn-pending-active:hover {
             background: #ffea00;
             box-shadow: 0 4px 15px rgba(255, 204, 0, 0.5);
-            transform: translateY(-1.5px); /* Efek terangkat sedikit bila hover */
+            transform: translateY(-1.5px);
+        }
+
+        /* Rekabentuk Butang On Going (Biru) */
+        .btn-ongoing-active {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #3b82f6; /* Warna biru modern */
+            color: white !important;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 6px;
+            text-decoration: none !important;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s ease-in-out;
+            border: 1px solid transparent;
+        }
+
+        .btn-ongoing-active:hover {
+            background: #60a5fa;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+            transform: translateY(-1.5px);
         }
 
         /* ===== REPORT FORM ===== */
@@ -244,7 +284,7 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
 </head>
 <body>
 
-<div class="header">
+    <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
@@ -280,11 +320,10 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
                         if(mysqli_num_rows($result) > 0){
                             while($row = mysqli_fetch_assoc($result)){
                                 $statusClass = "";
-                                if($row['Project_Status'] === "On Going")      $statusClass = "status-ongoing";
-                                elseif($row['Project_Status'] === "Completed")  $statusClass = "status-completed";
+                                if($row['Project_Status'] === "Completed") $statusClass = "status-completed";
                         ?>
                         <tr>
-                            <td>#<?php echo $row['Project_ID']; ?></td>
+                            <td><strong>#<?php echo $row['Project_ID']; ?></strong></td>
                             <td><?php echo htmlspecialchars($row['Project_Name']); ?></td>
                             <td>#<?php echo htmlspecialchars($row['Client_ID']); ?></td>
                             
@@ -292,6 +331,12 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
                                 <?php if($row['Project_Status'] === "Pending"){ ?>
                                     <a href="projectdetailsAD.php?id=<?php echo $row['Project_ID']; ?>" class="btn-pending-active">
                                         Pending
+                                    </a>
+                                <?php } elseif($row['Project_Status'] === "On Going"){ ?>
+                                    <a href="projectAD.php?action=complete&project_id=<?php echo $row['Project_ID']; ?>" 
+                                       class="btn-ongoing-active" 
+                                       onclick="return confirm('Are you sure you want to update Project #<?php echo $row['Project_ID']; ?> status to Completed?');">
+                                        On Going
                                     </a>
                                 <?php } else { ?>
                                     <span class="<?php echo $statusClass; ?>"><?php echo $row['Project_Status']; ?></span>
@@ -334,4 +379,3 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
 
 </body>
 </html>
-
