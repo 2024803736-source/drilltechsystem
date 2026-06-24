@@ -18,7 +18,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         header("Location: admin.php"); // redirect ke dashboard
         exit();
     } else {
-        $error = "ID atau Password salah!";
+        // Mesej ralat rasmi mengikut spesifikasi sistem
+        $error = "Wrong ID or Password !";
     }
 }
 ?>
@@ -73,7 +74,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             justify-content: center;
         }
 
-        h1 { 
+        <h1> { 
             font-size: 24px; 
             font-weight: 700; 
             letter-spacing: 1px; 

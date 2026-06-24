@@ -294,7 +294,7 @@ while($p = mysqli_fetch_assoc($payments)) {
     <span>🔧 DRILLTECH — Printable Project Summary</span>
     <div>
         <button onclick="window.print()">🖨 Print Report</button>
-        <button onclick="window.close()">✕ Close Sheet</button>
+        <button onclick="window.close()">✕ Back</button>
     </div>
 </div>
 

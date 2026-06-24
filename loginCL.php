@@ -17,11 +17,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             header("Location: client.php");
             exit();
         }else {
-            $error = "Client is not exist!";
+            // Diselaraskan kepada mesej ralat standard profesional
+            $error = "Wrong ID or Password!";
         }
     }else{
-            $error = "Wrong Password!";
-        
+        // Diselaraskan kepada mesej ralat standard profesional
+        $error = "Wrong ID or Password!";
     }
 }
 ?>

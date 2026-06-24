@@ -20,10 +20,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             header("Location: employee.php");
             exit();
         } else {
-            $error = "Employee ID tidak wujud!";
+            // Ditukar kepada mesej ralat standard profesional
+            $error = "Wrong ID or Password!";
         }
     } else {
-        $error = "Password salah! (Default: 101)";
+        // Ditukar kepada mesej ralat standard profesional
+        $error = "Wrong ID or Password!";
     }
 }
 ?>
@@ -134,7 +136,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             background: #28a745;
             color: white;
             border: none;
-            border-radius: 8px; /* Consistent rounded corners */
+            border-radius: 8px; 
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
@@ -175,7 +177,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
         <form method="post">
             <input type="text" name="employee_id" placeholder="Employee ID" required autocomplete="off">
-            <input type="password" name="password" placeholder="Password (Default: 101)" required>
+            <input type="password" name="password" placeholder="Password" required>
             <button type="submit" class="btn">LOG IN</button>
         </form>
 
