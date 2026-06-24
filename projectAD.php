@@ -10,9 +10,7 @@ include("database.php");
 
 $admin_name = $_SESSION['admin_name'] ?? 'Admin';
 
-// ==========================================
-// LOGIK UNTUK TUKAR STATUS PROJEK KE COMPLETED
-// ==========================================
+
 if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['project_id'])) {
     $projectID = mysqli_real_escape_string($conn, $_GET['project_id']);
     
