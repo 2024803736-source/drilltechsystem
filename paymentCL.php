@@ -79,6 +79,7 @@ $payments = mysqli_query($conn, "
         /* Badges */
         .status { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; text-transform: uppercase; }
         .status-completed { background: rgba(51, 153, 255, 0.12); color: #3399ff; border: 1px solid rgba(51, 153, 255, 0.25); }
+        .status-pending { background: rgba(255, 140, 0, 0.15); color: #ff8c00; border: 1px solid rgba(255, 140, 0, 0.3); }
         .status-unpaid { background: rgba(220, 53, 69, 0.15); color: #ff4d4d; border: 1px solid rgba(220, 53, 69, 0.3); }
         
         /* Buttons */
@@ -138,7 +139,14 @@ $payments = mysqli_query($conn, "
                         <td>
                             <?php 
                             if($row['Payment_ID']) {
-                                echo "<span class='status status-completed'>".htmlspecialchars($row['Payment_Status'])."</span>";
+                                $pStatus = strtoupper($row['Payment_Status']);
+                                if($pStatus === 'COMPLETED') {
+                                    echo "<span class='status status-completed'>COMPLETED</span>";
+                                } elseif($pStatus === 'PENDING') {
+                                    echo "<span class='status status-pending'>PENDING</span>";
+                                } else {
+                                    echo "<span class='status' style='background: rgba(255,255,255,0.1); color: #fff;'>".htmlspecialchars($row['Payment_Status'])."</span>";
+                                }
                             } else {
                                 echo "<span class='status status-unpaid'>Unpaid</span>";
                             }
@@ -147,7 +155,7 @@ $payments = mysqli_query($conn, "
                         <td><?php echo $row['Payment_Date'] ? htmlspecialchars($row['Payment_Date']) : "-"; ?></td>
                         <td><?php echo $row['Payment_Method'] ? htmlspecialchars($row['Payment_Method']) : "-"; ?></td>
                         <td>
-                            <?php if($row['Payment_ID']): ?>
+                            <?php if($row['Payment_ID'] && strtoupper($row['Payment_Status']) === 'COMPLETED'): ?>
                                 <a href="downloadReceipt.php?payment_id=<?php echo $row['Payment_ID']; ?>" class="btn-download">📥 Receipt</a>
                             <?php else: ?>
                                 <a href="makePaymentCL.php?project_id=<?php echo $row['ProjID']; ?>" class="btn-pay-now">💳 Pay Now</a>

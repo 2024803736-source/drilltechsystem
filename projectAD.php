@@ -310,13 +310,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                             <th>Project Name</th>
                             <th>Client ID</th>
                             <th>Project Status</th>
-                            <th>Payment Status</th> <th>Location</th>
+                            <th>Payment Status</th>
+                            <th>Location</th>
                             <th>Value (RM)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        // KEMASKINI QUERY: Menggunakan LEFT JOIN untuk menarik info dari table payment
+                        // Menggunakan LEFT JOIN untuk menarik info dari table payment
                         $query = "SELECT pr.*, p.Payment_ID, p.Payment_Status 
                                   FROM project pr 
                                   LEFT JOIN payment p ON pr.Project_ID = p.Project_ID 
@@ -351,12 +352,16 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                             
                             <td>
                                 <?php 
-                                if(!empty($row['Payment_ID'])) {
-                                    // Jika ada rekod bayaran dalam table payment
-                                    echo "<span class='pay-status pay-paid'>Paid</span>";
+                                if($row['Project_Status'] === "Pending") {
+                                    // Jika projek belum diaccept (Pending), tiada status bayaran keluar
+                                    echo "<span style='color: #64748b;'>-</span>";
                                 } else {
-                                    // Jika tiada rekod bayaran
-                                    echo "<span class='pay-status pay-unpaid'>Unpaid</span>";
+                                    // Jika projek sudah On Going atau Completed, baru semak status bayaran
+                                    if(!empty($row['Payment_ID'])) {
+                                        echo "<span class='pay-status pay-paid'>Paid</span>";
+                                    } else {
+                                        echo "<span class='pay-status pay-unpaid'>Unpaid</span>";
+                                    }
                                 }
                                 ?>
                             </td>
