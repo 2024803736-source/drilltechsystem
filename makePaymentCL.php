@@ -10,26 +10,51 @@ if(!isset($_SESSION['client_id'])){
 $client_id = $_SESSION['client_id'];
 $client_name = $_SESSION['client_name'];
 
-// Get client's projects
-$projects = mysqli_query($conn, "SELECT * FROM project WHERE Client_ID = $client_id");
+// Semak jika ada project_id yang dihantar dari page paymentCL.php
+if(!isset($_GET['project_id'])){
+    header("Location: paymentCL.php");
+    exit();
+}
+
+$selected_project_id = intval($_GET['project_id']);
+
+/**
+ * AMBIL DATA PROJEK YANG DIPILIH SAHAJA
+ * Tarik nama dan nilai harga projek terus dari pangkalan data berdasarkan ID projek tersebut.
+ */
+$project_query = mysqli_query($conn, "
+    SELECT Project_ID, Project_Name, Project_Value 
+    FROM project 
+    WHERE Project_ID = $selected_project_id AND Client_ID = $client_id
+");
+
+// Jika projek tidak wujud atau bukan milik client ini
+if(mysqli_num_rows($project_query) == 0){
+    header("Location: paymentCL.php");
+    exit();
+}
+
+$project_data = mysqli_fetch_assoc($project_query);
+$project_name = $project_data['Project_Name'];
+$amount = floatval($project_data['Project_Value']);
 
 $success = "";
 $error = "";
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
-    $project_id = intval($_POST['project_id']);
-    $amount = floatval($_POST['amount']);
     $method = mysqli_real_escape_string($conn, $_POST['method']);
 
     if($amount <= 0){
         $error = "Payment amount must be greater than zero!";
     } else {
+        // Masukkan rekod pembayaran baharu
         $sql = "INSERT INTO payment (Payment_Method, Payment_Date, Payment_Status, Payment_Time, Project_ID) 
-                VALUES ('$method', CURDATE(), 'Completed', CURTIME(), $project_id)";
+                VALUES ('$method', CURDATE(), 'Completed', CURTIME(), $selected_project_id)";
 
         if(mysqli_query($conn, $sql)){
-            $success = "Payment of RM " . number_format($amount, 2) . " was successful!";
-            header("refresh:3;url=paymentCL.php");
+            $_SESSION['payment_success'] = "Payment of RM " . number_format($amount, 2) . " for project '$project_name' was successful!";
+            header("Location: paymentCL.php");
+            exit();
         } else {
             $error = "Payment failed: " . mysqli_error($conn);
         }
@@ -47,7 +72,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: linear-gradient(rgba(0, 48, 135, 0.45), rgba(15, 20, 30, 0.9)), 
-                        url('backgroundCSC264.png') center/cover no-repeat fixed;
+                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
@@ -57,6 +82,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         }
         .content {
             max-width: 650px;
@@ -64,12 +90,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             background: rgba(0,0,0,0.85);
             padding: 40px;
             border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
         }
-        h2 { text-align: center; margin-bottom: 25px; }
-        .success { color: #28a745; text-align: center; font-size: 18px; margin: 15px 0; }
-        .error { color: #ff6b6b; text-align: center; margin: 15px 0; }
-        label { display: block; margin: 15px 0 8px; font-weight: bold; }
-        select, input { width: 100%; padding: 12px; border-radius: 8px; border: none; font-size: 16px; }
+        h2 { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #ff8c00; padding-bottom: 10px;}
+        .error { color: #ff6b6b; text-align: center; margin: 15px 0; font-weight: 600; }
+        label { display: block; margin: 15px 0 8px; font-weight: bold; color: #ffcc00;}
+        select, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); font-size: 16px; background: rgba(255,255,255,0.1); color: #fff;}
+        select option { background: #1e1e1e; color: #fff; }
+        
+        input[readonly] {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffcc00;
+            font-weight: 600;
+            cursor: not-allowed;
+            border: 1px dashed rgba(255,255,255,0.1);
+        }
         .btn {
             width: 100%;
             padding: 15px;
@@ -81,7 +116,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             font-weight: bold;
             margin-top: 25px;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
+        .btn:hover { background: #218838; transform: translateY(-2px); }
     </style>
 </head>
 <body>
@@ -91,24 +128,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
 
     <div class="content">
-        <h2>Make New Payment</h2>
+        <h2>Confirm Payment Details</h2>
 
-        <?php if($success) echo "<p class='success'>$success <br><small>Redirecting...</small></p>"; ?>
-        <?php if($error) echo "<p class='error'>$error</p>"; ?>
+        <?php if($error) echo "<p class='error'>⚠️ $error</p>"; ?>
 
         <form method="POST">
-            <label>Select Project</label>
-            <select name="project_id" required>
-                <option value="">-- Choose Project --</option>
-                <?php while($row = mysqli_fetch_assoc($projects)): ?>
-                    <option value="<?php echo $row['Project_ID']; ?>">
-                        <?php echo htmlspecialchars($row['Project_Name']); ?> 
-                    </option>
-                <?php endwhile; ?>
-            </select>
+            <label>Selected Project</label>
+            <input type="text" readonly value="#<?php echo $selected_project_id; ?> - <?php echo htmlspecialchars($project_name); ?>">
 
             <label>Payment Amount (RM)</label>
-            <input type="number" name="amount" step="0.01" min="1" required>
+            <input type="text" readonly value="RM <?php echo number_format($amount, 2); ?>">
 
             <label>Payment Method</label>
             <select name="method" required>
@@ -121,7 +150,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </form>
 
         <p style="text-align:center; margin-top:25px;">
-            <a href="paymentCL.php" style="color:#1E90FF;">← Back to Payment History</a>
+            <a href="paymentCL.php" style="color:#1E90FF; text-decoration:none;">← Cancel & Go Back</a>
         </p>
     </div>
 </body>

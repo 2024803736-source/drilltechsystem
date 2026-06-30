@@ -38,14 +38,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Lighter grey-tinted construction background overlay */
             background: linear-gradient(rgba(74, 74, 74, 0.45), rgba(15, 15, 15, 0.95)), 
                         url('images/construction_bg.jpg') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
 
-        /* ===== HEADER (#4a4a4a grey) ===== */
+        /* ===== HEADER ===== */
         .header {
             background: #4a4a4a;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -85,7 +84,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             margin-top: 60px;
         }
 
-        /* ===== SIDEBAR (#5a5a5a grey) ===== */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             width: 240px;
             background: #5a5a5a;
@@ -154,7 +153,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             font-size: 14px;
-            vertical-align: middle; /* Pastikan butang center secara menegak */
+            vertical-align: middle;
         }
         
         tr:hover td {
@@ -173,7 +172,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
         /* ===== STATUS LABELS & BUTTONS ===== */
         .status-completed { color: #34d399; font-weight: bold; }
         
-        /* Rekabentuk Butang Pending (Kuning Asal) */
+        /* Badges untuk Payment Status */
+        .pay-status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; text-transform: uppercase; }
+        .pay-paid { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .pay-unpaid { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
         .btn-pending-active { 
             display: inline-block;
             padding: 6px 16px;
@@ -196,11 +199,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             transform: translateY(-1.5px);
         }
 
-        /* Rekabentuk Butang On Going (Biru) */
         .btn-ongoing-active {
             display: inline-block;
             padding: 6px 16px;
-            background: #3b82f6; /* Warna biru modern */
+            background: #3b82f6; 
             color: white !important;
             font-weight: 700;
             font-size: 12px;
@@ -307,14 +309,20 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                             <th>Project ID</th>
                             <th>Project Name</th>
                             <th>Client ID</th>
-                            <th>Status</th>
-                            <th>Location</th>
+                            <th>Project Status</th>
+                            <th>Payment Status</th> <th>Location</th>
                             <th>Value (RM)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $result = mysqli_query($conn, "SELECT * FROM project ORDER BY Project_ID");
+                        // KEMASKINI QUERY: Menggunakan LEFT JOIN untuk menarik info dari table payment
+                        $query = "SELECT pr.*, p.Payment_ID, p.Payment_Status 
+                                  FROM project pr 
+                                  LEFT JOIN payment p ON pr.Project_ID = p.Project_ID 
+                                  ORDER BY pr.Project_ID";
+                                  
+                        $result = mysqli_query($conn, $query);
                         if(mysqli_num_rows($result) > 0){
                             while($row = mysqli_fetch_assoc($result)){
                                 $statusClass = "";
@@ -330,7 +338,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                                     <a href="projectdetailsAD.php?id=<?php echo $row['Project_ID']; ?>" class="btn-pending-active">
                                         Pending
                                     </a>
-                                <?php } elseif($row['Project_Status'] === "On Going"){ ?>
+                                <?php } elseif($row['Project_Status'] === "On Going" || $row['Project_Status'] === "Ongoing"){ ?>
                                     <a href="projectAD.php?action=complete&project_id=<?php echo $row['Project_ID']; ?>" 
                                        class="btn-ongoing-active" 
                                        onclick="return confirm('Are you sure you want to update Project #<?php echo $row['Project_ID']; ?> status to Completed?');">
@@ -341,13 +349,25 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                                 <?php } ?>
                             </td>
                             
+                            <td>
+                                <?php 
+                                if(!empty($row['Payment_ID'])) {
+                                    // Jika ada rekod bayaran dalam table payment
+                                    echo "<span class='pay-status pay-paid'>Paid</span>";
+                                } else {
+                                    // Jika tiada rekod bayaran
+                                    echo "<span class='pay-status pay-unpaid'>Unpaid</span>";
+                                }
+                                ?>
+                            </td>
+                            
                             <td><?php echo htmlspecialchars($row['Project_Location']); ?></td>
                             <td>RM <?php echo number_format($row['Project_Value'], 2); ?></td>
                         </tr>
                         <?php
                             }
                         } else {
-                            echo "<tr><td colspan='6' style='text-align: center; color: #64748b; font-style: italic; border: none;'>No projects found.</td></tr>";
+                            echo "<tr><td colspan='7' style='text-align: center; color: #64748b; font-style: italic; border: none;'>No projects found.</td></tr>";
                         }
                         ?>
                     </tbody>
