@@ -10,6 +10,7 @@ if(!isset($_SESSION['client_id'])){
 $client_id = $_SESSION['client_id'];
 $client_name = $_SESSION['client_name'];
 
+// Fetch payments
 $payments = mysqli_query($conn, "
     SELECT p.*, pr.Project_Name, pr.Project_ID as ProjID 
     FROM payment p 
@@ -30,7 +31,7 @@ $payments = mysqli_query($conn, "
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: linear-gradient(rgba(0, 48, 135, 0.45), rgba(15, 20, 30, 0.9)), 
-                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+                        url('backgroundCSC264.png') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
@@ -135,7 +136,7 @@ $payments = mysqli_query($conn, "
             letter-spacing: 0.5px;
         }
 
-        /* Status Badges disamakan dengan projectCL.php */
+        /* Status Badges */
         .status {
             padding: 5px 12px; 
             border-radius: 20px; 
@@ -143,12 +144,6 @@ $payments = mysqli_query($conn, "
             font-weight: 700; 
             display: inline-block;
             text-transform: uppercase;
-        }
-        
-        .status-ongoing { 
-            background: rgba(0, 204, 102, 0.12); 
-            color: #00cc66; 
-            border: 1px solid rgba(0, 204, 102, 0.25); 
         }
         
         .status-completed { 
@@ -163,6 +158,7 @@ $payments = mysqli_query($conn, "
             border: 1px solid rgba(255, 204, 0, 0.25); 
         }
 
+        /* Receipt Button */
         .btn-download {
             background: rgba(0, 204, 102, 0.12);
             color: #00cc66;
@@ -180,6 +176,22 @@ $payments = mysqli_query($conn, "
         .btn-download:hover {
             background: #00cc66;
             color: white;
+        }
+
+        /* Disabled button (Pending) */
+        .btn-disabled {
+            background: rgba(100, 100, 100, 0.2);
+            color: #666;
+            border: 1px solid rgba(100, 100, 100, 0.3);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: not-allowed;
+            pointer-events: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .action-buttons { text-align: center; margin-top: 30px; }
@@ -203,22 +215,6 @@ $payments = mysqli_query($conn, "
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(255, 140, 0, 0.4);
         }
-
-        .btn-make:active {
-            transform: translateY(1px);
-        }
-
-        .success-flash {
-            background: rgba(40, 167, 69, 0.15);
-            border: 1px solid rgba(40, 167, 69, 0.3);
-            color: #2ecc71;
-            padding: 14px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
     </style>
 </head>
 <body>
@@ -238,13 +234,6 @@ $payments = mysqli_query($conn, "
     <div class="content">
         <div class="main-box">
             <h2>Payment History</h2>
-            
-            <?php if(isset($_SESSION['payment_success'])): ?>
-                <div class="success-flash">
-                    🎉 <?php echo $_SESSION['payment_success']; ?>
-                    <?php unset($_SESSION['payment_success']); ?>
-                </div>
-            <?php endif; ?>
             
             <table>
                 <thead>
@@ -267,29 +256,23 @@ $payments = mysqli_query($conn, "
                         <td>
                             <?php 
                             $status = $row['Payment_Status'];
-                            // Logik pertukaran warna lencana mengikut data string database
-                            $class = ($status == 'On Going' || $status == 'Ongoing') ? 'status-ongoing' : 
-                                    (($status == 'Completed') ? 'status-completed' : 'status-pending');
+                            $class = ($status == 'Completed') ? 'status-completed' : 'status-pending';
                             echo "<span class='status $class'>$status</span>";
                             ?>
                         </td>
                         <td><?php echo htmlspecialchars($row['Payment_Date']); ?></td>
                         <td><?php echo htmlspecialchars($row['Payment_Method']); ?></td>
                         <td>
-                            <a href="downloadReceipt.php?payment_id=<?php echo $row['Payment_ID']; ?>" class="btn-download">
-                                📥 Receipt
-                            </a>
+                            <?php if($row['Payment_Status'] == 'Completed'): ?>
+                                <a href="downloadReceipt.php?payment_id=<?php echo $row['Payment_ID']; ?>" class="btn-download">
+                                    📥 Receipt
+                                </a>
+                            <?php else: ?>
+                                <span class="btn-disabled">Pending</span>
+                            <?php endif; ?>
                         </td>
                     </tr>
                     <?php endwhile; ?>
-                    
-                    <?php if(mysqli_num_rows($payments) == 0): ?>
-                        <tr>
-                            <td colspan="7" style="text-align: center; color: #64748b; font-style: italic; border: none;">
-                                No payments record found.
-                            </td>
-                        </tr>
-                    <?php endif; ?>
                 </tbody>
             </table>
 
