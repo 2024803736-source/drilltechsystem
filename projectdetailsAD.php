@@ -22,6 +22,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $supervisor = $_POST['supervisor'];
     $workers = isset($_POST['workers']) ? $_POST['workers'] : [];
 
+    // Server-side validation: Check if less than 5 workers are selected
+    if(count($workers) < 5){
+        echo "<script>alert('Please select at least 5 General Workers.'); window.history.back();</script>";
+        exit();
+    }
+
     // === LANGKAH KESELAMATAN: Padam rekod lama dulu untuk elak Duplicate Entry ===
     mysqli_query($conn, "DELETE FROM assigned_employee WHERE Project_ID = '$projectID'");
     mysqli_query($conn, "DELETE FROM equipment_usage WHERE Project_ID = '$projectID'");
@@ -353,7 +359,7 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
             </div>
 
             <div class="form-box">
-                <form method="post">
+                <form method="post" onsubmit="return validateWorkers();">
 
                     <h3>Employee Assignment Timeline</h3>
                     <div class="date-range-container">
@@ -393,12 +399,12 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                         <?php } ?>
                     </select>
 
-                    <label>General Worker (pilih max 5):</label>
+                    <label style="color: #ffcc00;">General Worker (Please select at least 5 workers):</label>
                     <?php 
                     mysqli_data_seek($workers, 0); // Reset pointer
                     while($row = mysqli_fetch_assoc($workers)){ ?>
                         <div class="checkbox-item">
-                            <input type="checkbox" name="workers[]" value="<?php echo $row['Employee_ID']; ?>">
+                            <input type="checkbox" name="workers[]" value="<?php echo $row['Employee_ID']; ?>" class="worker-checkbox">
                             <span><?php echo $row['Employee_ID']." - ".$row['Employee_Name']; ?></span>
                         </div>
                     <?php } ?>
@@ -440,6 +446,28 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
         </div>
 
     </div>
+
+    <script>
+    function validateWorkers() {
+        var checkboxes = document.querySelectorAll('.worker-checkbox');
+        var checkedCount = 0;
+        
+        // Count how many checkboxes are ticked
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                checkedCount++;
+            }
+        }
+        
+        // Validation: Must select at least 5 workers
+        if (checkedCount < 5) {
+            alert("⚠️ Warning: You must select at least 5 General Workers! Currently selected: " + checkedCount);
+            return false; 
+        }
+        
+        return true; 
+    }
+    </script>
 
 </body>
 </html>

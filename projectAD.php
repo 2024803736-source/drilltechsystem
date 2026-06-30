@@ -22,7 +22,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
         header("Location: projectAD.php");
         exit();
     } else {
-        echo "<script>alert('Gagal mengemas kini status projek.');</script>";
+        echo "<script>alert('Failed to update project status.');</script>";
     }
 }
 ?>
@@ -343,7 +343,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                                     <a href="projectAD.php?action=complete&project_id=<?php echo $row['Project_ID']; ?>" 
                                        class="btn-ongoing-active" 
                                        onclick="return confirm('Are you sure you want to update Project #<?php echo $row['Project_ID']; ?> status to Completed?');">
-                                        On Going
+                                         On Going
                                     </a>
                                 <?php } else { ?>
                                     <span class="<?php echo $statusClass; ?>"><?php echo $row['Project_Status']; ?></span>
@@ -386,7 +386,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                     <select name="id" id="projectID" required>
                         <option value="">-- Choose Project ID --</option>
                         <?php
-                        $projList = mysqli_query($conn, "SELECT Project_ID, Project_Name FROM project ORDER BY Project_ID");
+                        // PENAPISAN SQL: Hanya tarik projek yang berstatus On Going, Ongoing, atau Completed sahaja
+                        $projList = mysqli_query($conn, "SELECT Project_ID, Project_Name FROM project WHERE Project_Status IN ('On Going', 'Ongoing', 'Completed') ORDER BY Project_ID");
                         while($p = mysqli_fetch_assoc($projList)){
                             echo "<option value='".$p['Project_ID']."'>#".$p['Project_ID']." - ".htmlspecialchars($p['Project_Name'])."</option>";
                         }
