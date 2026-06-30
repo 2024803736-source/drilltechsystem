@@ -10,15 +10,12 @@ include("database.php");
 
 $admin_name = $_SESSION['admin_name'] ?? 'Admin';
 
-
 if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['project_id'])) {
     $projectID = mysqli_real_escape_string($conn, $_GET['project_id']);
     
-    // Kemaskini status projek dalam database
     $updateQuery = "UPDATE project SET Project_Status = 'Completed' WHERE Project_ID = '$projectID'";
     
     if (mysqli_query($conn, $updateQuery)) {
-        // Berjaya kemaskini, refresh halaman tanpa parameter GET
         header("Location: projectAD.php");
         exit();
     } else {
@@ -76,6 +73,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 6px 14px;
             border-radius: 20px;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
         }
 
         /* ===== LAYOUT WRAPPER ===== */
@@ -141,7 +153,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             color: #fff;
         }
 
-        /* ===== TABLE ===== */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -169,14 +180,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             letter-spacing: 0.5px;
         }
 
-        /* ===== STATUS LABELS & BUTTONS ===== */
         .status-completed { color: #34d399; font-weight: bold; }
         
-        /* Badges untuk Payment Status */
-        .pay-status { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; text-transform: uppercase; }
-        .pay-paid { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
-        .pay-unpaid { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-
         .btn-pending-active { 
             display: inline-block;
             padding: 6px 16px;
@@ -190,7 +195,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             text-decoration: none !important;
             box-shadow: 0 2px 8px rgba(255, 204, 0, 0.3);
             transition: all 0.2s ease-in-out;
-            border: 1px solid transparent;
         }
 
         .btn-pending-active:hover {
@@ -212,7 +216,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             text-decoration: none !important;
             box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
             transition: all 0.2s ease-in-out;
-            border: 1px solid transparent;
         }
 
         .btn-ongoing-active:hover {
@@ -221,7 +224,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             transform: translateY(-1.5px);
         }
 
-        /* ===== REPORT FORM ===== */
         .report-box form {
             display: flex;
             align-items: center;
@@ -246,11 +248,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             min-width: 250px;
         }
 
-        select option {
-            background-color: #282828;
-            color: white;
-        }
-
         .report-box button {
             padding: 12px 24px;
             background: #ff8c00;
@@ -268,18 +265,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
             background: #e07b00;
             transform: translateY(-1px);
         }
-
-        a {
-            color: #60a5fa;
-            text-decoration: none;
-            font-weight: 700;
-            transition: color 0.2s;
-        }
-        
-        a:hover {
-            color: #93c5fd;
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
@@ -288,7 +273,10 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
     </div>
     
     <div class="wrapper">
@@ -317,7 +305,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                     </thead>
                     <tbody>
                         <?php
-                        // Menggunakan LEFT JOIN untuk menarik info dari table payment
                         $query = "SELECT pr.*, p.Payment_ID, p.Payment_Status 
                                   FROM project pr 
                                   LEFT JOIN payment p ON pr.Project_ID = p.Project_ID 
@@ -353,10 +340,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                             <td>
                                 <?php 
                                 if($row['Project_Status'] === "Pending") {
-                                    // Jika projek belum diaccept (Pending), tiada status bayaran keluar
                                     echo "<span style='color: #64748b;'>-</span>";
                                 } else {
-                                    // Jika projek sudah On Going atau Completed, baru semak status bayaran
                                     if(!empty($row['Payment_ID'])) {
                                         echo "<span class='pay-status pay-paid'>Paid</span>";
                                     } else {
@@ -386,7 +371,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'complete' && isset($_GET['pro
                     <select name="id" id="projectID" required>
                         <option value="">-- Choose Project ID --</option>
                         <?php
-                        // PENAPISAN SQL: Hanya tarik projek yang berstatus On Going, Ongoing, atau Completed sahaja
                         $projList = mysqli_query($conn, "SELECT Project_ID, Project_Name FROM project WHERE Project_Status IN ('On Going', 'Ongoing', 'Completed') ORDER BY Project_ID");
                         while($p = mysqli_fetch_assoc($projList)){
                             echo "<option value='".$p['Project_ID']."'>#".$p['Project_ID']." - ".htmlspecialchars($p['Project_Name'])."</option>";

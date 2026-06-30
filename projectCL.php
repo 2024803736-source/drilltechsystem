@@ -27,19 +27,16 @@ $projects = mysqli_query($conn, "
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - DrillTech HDD</title>
     <style>
-        /* CSS Reset & Modern Typography */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Blue-tinted construction background overlay */
             background: linear-gradient(rgba(0, 48, 135, 0.45), rgba(15, 20, 30, 0.9)), 
-                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+                        url('backgroundCSC264.png') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
 
-        /* Top Header Navigation (#003087 blue) */
         .header {
             background: #003087;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -49,9 +46,7 @@ $projects = mysqli_query($conn, "
             align-items: center;
             justify-content: space-between;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             z-index: 100;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
@@ -75,7 +70,21 @@ $projects = mysqli_query($conn, "
             border-radius: 20px;
         }
 
-        /* Side Navigation Panel (#003087 blue) */
+        /* Logout Button */
+        .logout-btn {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
+        }
+
         .sidebar {
             width: 240px;
             background: #003087;
@@ -102,24 +111,16 @@ $projects = mysqli_query($conn, "
             gap: 10px;
         }
         
-        /* Sidebar Hover and Active (#ff8c00 orange) */
-        .sidebar a:hover { 
+        .sidebar a:hover, .sidebar a.active { 
             color: #fff;
             background: #ff8c00;
         }
 
-        .sidebar a.active { 
-            color: #fff;
-            background: #ff8c00; 
-        }
-
-        /* Main Content Layout */
         .content {
             margin-left: 260px;
             padding: 94px 30px 40px 30px;
         }
 
-        /* Table Card Container */
         .main-box {
             background: rgba(0, 0, 0, 0.65); 
             border: 1px solid rgba(0, 48, 135, 0.35);
@@ -137,7 +138,6 @@ $projects = mysqli_query($conn, "
             padding-bottom: 10px;
         }
 
-        /* Styled Table */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -164,7 +164,6 @@ $projects = mysqli_query($conn, "
             letter-spacing: 0.5px;
         }
 
-        /* Status Badges */
         .status {
             padding: 5px 12px; 
             border-radius: 20px; 
@@ -192,14 +191,9 @@ $projects = mysqli_query($conn, "
             border: 1px solid rgba(255, 204, 0, 0.25); 
         }
 
-        /* Add Project Button Styling */
         .button-container {
             text-align: center;
             margin-top: 30px;
-        }
-
-        .button-container a {
-            text-decoration: none;
         }
 
         .add-project {
@@ -207,7 +201,7 @@ $projects = mysqli_query($conn, "
             color: white;
             padding: 14px 32px;
             border: none;
-            border-radius: 8px; /* Consistent corners */
+            border-radius: 8px;
             font-size: 15px;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -221,29 +215,25 @@ $projects = mysqli_query($conn, "
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(255, 140, 0, 0.4);
         }
-
-        .add-project:active {
-            transform: translateY(1px);
-        }
     </style>
 </head>
 <body>
-    <!-- Top Header Navigation -->
     <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div class="user-welcome">Welcome, <?php echo htmlspecialchars($client_name); ?></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="user-welcome">Welcome, <?php echo htmlspecialchars($client_name); ?></div>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
     </div>
 
-    <!-- Side Navigation Bar -->
     <div class="sidebar">
         <a href="client.php">📊 DASHBOARD</a>
         <a href="projectCL.php" class="active">🔍 PROJECT</a>
         <a href="paymentCL.php">💰 PAYMENT</a>
     </div>
 
-    <!-- Main View Panel -->
     <div class="content">
         <div class="main-box">
             <h2>Projects:</h2>
@@ -286,7 +276,6 @@ $projects = mysqli_query($conn, "
                 </tbody>
             </table>
 
-            <!-- Centered Button -->
             <div class="button-container">
                 <a href="addProjectCL.php" class="add-project">Add Project Request (+)</a>
             </div>

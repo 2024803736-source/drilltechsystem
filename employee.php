@@ -1,16 +1,17 @@
 <?php
 session_start();
+include("database.php");
+
 if(!isset($_SESSION['username'])){
     header("Location: loginEM.php");
     exit();
 }
-include("database.php");
 
 // Cari Employee_ID berdasarkan username login
 $employeeName = $_SESSION['username'];
 $empQuery = mysqli_query($conn, "SELECT Employee_ID FROM employee WHERE Employee_Name='$employeeName'");
 $empRow = mysqli_fetch_assoc($empQuery);
-$employeeID = $empRow['Employee_ID'];
+$employeeID = $empRow['Employee_ID'] ?? '';
 
 // Statistik projek untuk employee login
 $pending = mysqli_fetch_assoc(mysqli_query($conn, "
@@ -50,19 +51,16 @@ $recentUpdates = mysqli_query($conn, "
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Dashboard - DrillTech HDD</title>
     <style>
-        /* CSS Reset & Modern Typography */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Lighter green overlay using your corporate #004d00 color */
             background: linear-gradient(rgba(0, 77, 0, 0.45), rgba(15, 23, 18, 0.85)), 
-                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+                        url('backgroundCSC264.png') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
 
-        /* Top Header Navigation (#004d00 green) */
         .header {
             background: #004d00;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -98,7 +96,21 @@ $recentUpdates = mysqli_query($conn, "
             border-radius: 20px;
         }
 
-        /* Side Navigation Panel (#004d00 green) */
+        /* Logout Button */
+        .logout-btn {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
+        }
+
         .sidebar {
             width: 240px;
             background: #004d00;
@@ -124,7 +136,6 @@ $recentUpdates = mysqli_query($conn, "
             transition: all 0.2s ease;
         }
         
-        /* Sidebar Hover and Active (#ff8c00 orange) */
         .sidebar a:hover { 
             color: #fff;
             background: #ff8c00;
@@ -135,7 +146,6 @@ $recentUpdates = mysqli_query($conn, "
             background: #ff8c00; 
         }
 
-        /* Main Dashboard Content Layout */
         .content { 
             margin-left: 260px; 
             padding: 94px 30px 40px 30px; 
@@ -148,7 +158,6 @@ $recentUpdates = mysqli_query($conn, "
             letter-spacing: 0.5px;
         }
 
-        /* Stats Cards Flex Grid */
         .stats { 
             display: flex; 
             gap: 20px; 
@@ -159,7 +168,6 @@ $recentUpdates = mysqli_query($conn, "
         .stat-card {
             flex: 1; 
             min-width: 200px;
-            /* Semi-transparent dark cards with subtle green borders */
             background: rgba(0, 0, 0, 0.65);
             border: 1px solid rgba(0, 77, 0, 0.35);
             padding: 24px; 
@@ -172,7 +180,6 @@ $recentUpdates = mysqli_query($conn, "
         .stat-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0, 77, 0, 0.25);
-            border-color: rgba(40, 167, 69, 0.5);
         }
 
         .stat-label {
@@ -190,13 +197,6 @@ $recentUpdates = mysqli_query($conn, "
             margin-bottom: 6px;
         }
 
-        .stat-card small {
-            font-size: 12px;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        /* Recent Activity Log Card */
         .recent-updates {
             background: rgba(0, 0, 0, 0.65);
             border: 1px solid rgba(0, 77, 0, 0.3);
@@ -230,10 +230,6 @@ $recentUpdates = mysqli_query($conn, "
             align-items: center;
         }
 
-        .recent-updates li:last-child {
-            margin-bottom: 0;
-        }
-
         .project-name {
             font-weight: 600;
             color: #fff;
@@ -247,7 +243,6 @@ $recentUpdates = mysqli_query($conn, "
             text-transform: uppercase;
         }
 
-        /* Status Colors */
         .status-pending { background: rgba(255, 204, 0, 0.12); color: #ffcc00; border: 1px solid rgba(255, 204, 0, 0.25); }
         .status-ongoing { background: rgba(0, 204, 102, 0.12); color: #00cc66; border: 1px solid rgba(0, 204, 102, 0.25); }
         .status-completed { background: rgba(51, 153, 255, 0.12); color: #3399ff; border: 1px solid rgba(51, 153, 255, 0.25); }
@@ -262,15 +257,16 @@ $recentUpdates = mysqli_query($conn, "
     </style>
 </head>
 <body>
-    <!-- Top Header Navigation -->
     <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div class="user-welcome">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="user-welcome">Welcome, <?php echo htmlspecialchars($employeeName); ?></div>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
     </div>
 
-    <!-- Side Navigation Bar -->
     <div class="sidebar">
         <a href="employee.php" class="active">📊 DASHBOARD</a>
         <a href="projectEM.php">🔍 PROJECT</a>
@@ -278,11 +274,9 @@ $recentUpdates = mysqli_query($conn, "
         <a href="payrollEM.php">💰 PAYROLL</a>
     </div>
 
-    <!-- Main View Panel -->
     <div class="content">
-        <h1 class="welcome">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
+        <h1 class="welcome">Welcome, <?php echo htmlspecialchars($employeeName); ?></h1>
 
-        <!-- Stats Container -->
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-label">PENDING PROJECTS</div>
@@ -301,14 +295,12 @@ $recentUpdates = mysqli_query($conn, "
             </div>
         </div>
 
-        <!-- Recent Project Updates List -->
         <div class="recent-updates">
             <h3>Recent Updates:</h3>
             <ul>
                 <?php while($row = mysqli_fetch_assoc($recentUpdates)): 
-                    // Dynamic styling based on the project status
                     $status = strtolower(trim($row['Project_Status']));
-                    $statusClass = 'status-pending'; // default
+                    $statusClass = 'status-pending';
                     
                     if ($status === 'on going' || $status === 'ongoing' || $status === 'active') {
                         $statusClass = 'status-ongoing';

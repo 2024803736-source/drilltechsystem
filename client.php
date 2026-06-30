@@ -25,19 +25,16 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - DrillTech HDD</title>
     <style>
-        /* CSS Reset & Modern Typography */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Blue-tinted construction background overlay */
             background: linear-gradient(rgba(0, 48, 135, 0.45), rgba(15, 20, 30, 0.9)), 
-                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+                        url('backgroundCSC264.png') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
 
-        /* Top Header Navigation (#003087 blue) */
         .header {
             background: #003087;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -73,7 +70,21 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
             border-radius: 20px;
         }
 
-        /* Side Navigation Panel (#003087 blue) */
+        /* Logout Button */
+        .logout-btn {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
+        }
+
         .sidebar {
             width: 240px;
             background: #003087;
@@ -99,18 +110,11 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
             transition: all 0.2s ease;
         }
         
-        /* Sidebar Hover and Active (#ff8c00 orange) */
-        .sidebar a:hover { 
+        .sidebar a:hover, .sidebar a.active { 
             color: #fff;
             background: #ff8c00;
         }
 
-        .sidebar a.active { 
-            color: #fff;
-            background: #ff8c00; 
-        }
-
-        /* Main Content Layout */
         .content {
             margin-left: 260px;
             padding: 94px 30px 40px 30px;
@@ -123,7 +127,6 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
             letter-spacing: 0.5px;
         }
 
-        /* Stats Grid Layout */
         .stats {
             display: flex;
             gap: 20px;
@@ -134,7 +137,6 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
         .stat-card {
             flex: 1;
             min-width: 200px;
-            /* Dark transparent cards with blue borders */
             background: rgba(0, 0, 0, 0.65);
             border: 1px solid rgba(0, 48, 135, 0.35);
             padding: 24px;
@@ -171,7 +173,6 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
             font-weight: 500;
         }
 
-        /* Recent Activity Log Box */
         .recent-updates {
             background: rgba(0, 0, 0, 0.65);
             border: 1px solid rgba(0, 48, 135, 0.3);
@@ -222,7 +223,6 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
             text-transform: uppercase;
         }
 
-        /* Dynamic Status Styling */
         .status-pending { background: rgba(255, 204, 0, 0.12); color: #ffcc00; border: 1px solid rgba(255, 204, 0, 0.25); }
         .status-ongoing { background: rgba(0, 204, 102, 0.12); color: #00cc66; border: 1px solid rgba(0, 204, 102, 0.25); }
         .status-completed { background: rgba(51, 153, 255, 0.12); color: #3399ff; border: 1px solid rgba(51, 153, 255, 0.25); }
@@ -237,26 +237,25 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
     </style>
 </head>
 <body>
-    <!-- Top Header Navigation -->
     <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div class="user-welcome">Welcome, <?php echo htmlspecialchars($client_name); ?></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="user-welcome">Welcome, <?php echo htmlspecialchars($client_name); ?></div>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
     </div>
 
-    <!-- Side Navigation Bar -->
     <div class="sidebar">
         <a href="client.php" class="active">📊 DASHBOARD</a>
         <a href="projectCL.php">🔍 PROJECT</a>
         <a href="paymentCL.php">💰 PAYMENT</a>
     </div>
 
-    <!-- Main Content Panel -->
     <div class="content">
         <h1 class="welcome">Welcome, <?php echo htmlspecialchars($client_name); ?></h1>
 
-        <!-- Stats Container -->
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-label">PENDING REQUESTS</div>
@@ -275,13 +274,12 @@ $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project 
             </div>
         </div>
 
-        <!-- Recent Updates Card -->
         <div class="recent-updates">
             <h3>Recent Updates:</h3>
             <ul>
                 <?php while($row = mysqli_fetch_assoc($recent)): 
                     $status = strtolower(trim($row['Project_Status']));
-                    $statusClass = 'status-pending'; // default
+                    $statusClass = 'status-pending';
                     
                     if ($status === 'on going' || $status === 'ongoing' || $status === 'active') {
                         $statusClass = 'status-ongoing';

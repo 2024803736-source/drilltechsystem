@@ -1,12 +1,12 @@
 <?php
 session_start();
-if(!isset($_SESSION['username'])){
+include("database.php");
+
+if(!isset($_SESSION['employee_id'])){
     header("Location: loginEM.php");
     exit();
 }
-include("database.php");
 
-// Ambil Employee_ID dari session
 $employeeID = $_SESSION['employee_id'];
 $employeeName = $_SESSION['username'];
 
@@ -26,19 +26,16 @@ $projects = mysqli_query($conn, "
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects - DrillTech HDD</title>
     <style>
-        /* CSS Reset & Modern Typography */
         * { margin:0; padding:0; box-sizing:border-box; }
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Lighter green overlay matching the dashboard */
             background: linear-gradient(rgba(0, 77, 0, 0.45), rgba(15, 23, 18, 0.85)), 
-                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+                        url('backgroundCSC264.png') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
 
-        /* Top Header Navigation (#004d00 green) */
         .header {
             background: #004d00;
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -74,7 +71,21 @@ $projects = mysqli_query($conn, "
             border-radius: 20px;
         }
 
-        /* Side Navigation Panel (#004d00 green) */
+        /* Logout Button */
+        .logout-btn {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
+        }
+
         .sidebar {
             width: 240px; 
             background: #004d00; 
@@ -82,7 +93,7 @@ $projects = mysqli_query($conn, "
             position: fixed; 
             top: 64px;
             left: 0;
-            height: 100vh; 
+            height: calc(100vh - 64px); 
             padding-top: 20px;
             z-index: 90;
             box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
@@ -101,7 +112,6 @@ $projects = mysqli_query($conn, "
             gap: 10px;
         }
         
-        /* Sidebar Hover and Active (#ff8c00 orange) */
         .sidebar a:hover { 
             color: #fff;
             background: #ff8c00; 
@@ -112,13 +122,11 @@ $projects = mysqli_query($conn, "
             background: #ff8c00; 
         }
 
-        /* Main Dashboard Content Layout */
         .content { 
             margin-left: 260px; 
             padding: 94px 30px 40px 30px; 
         }
 
-        /* Table Card Container */
         .main-box {
             background: rgba(0, 0, 0, 0.65); 
             border: 1px solid rgba(0, 77, 0, 0.3);
@@ -136,7 +144,6 @@ $projects = mysqli_query($conn, "
             padding-bottom: 10px;
         }
 
-        /* Styled Table */
         table { 
             width: 100%; 
             border-collapse: collapse; 
@@ -163,7 +170,6 @@ $projects = mysqli_query($conn, "
             letter-spacing: 0.5px;
         }
 
-        /* Status Badges */
         .status {
             padding: 5px 12px; 
             border-radius: 20px; 
@@ -194,12 +200,16 @@ $projects = mysqli_query($conn, "
 </head>
 <body>
    
-<div class="header">
+    <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div class="user-welcome">Welcome, <?php echo htmlspecialchars($employeeName); ?></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="user-welcome">Welcome, <?php echo htmlspecialchars($employeeName); ?></div>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
     </div>
+
     <!-- Side Navigation Bar -->
     <div class="sidebar">
         <a href="employee.php">📊 DASHBOARD</a>

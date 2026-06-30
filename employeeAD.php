@@ -22,7 +22,6 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Lighter grey-tinted construction background overlay */
             background: linear-gradient(rgba(74, 74, 74, 0.45), rgba(15, 15, 15, 0.95)), 
                         url('images/construction_bg.jpg') center/cover no-repeat fixed;
             color: #f8fafc;
@@ -61,6 +60,21 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 6px 14px;
             border-radius: 20px;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
         }
 
         /* ===== LAYOUT WRAPPER ===== */
@@ -154,8 +168,8 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
         }
 
         /* ===== STATUS LABELS ===== */
-        .status-paid    { color: #34d399; font-weight: bold; } /* Hijau terang emerald */
-        .status-unpaid  { color: #f87171; font-weight: bold; } /* Merah terang pastel */
+        .status-paid    { color: #34d399; font-weight: bold; }
+        .status-unpaid  { color: #f87171; font-weight: bold; }
 
         a {
             color: #60a5fa;
@@ -176,7 +190,10 @@ $admin_name = $_SESSION['admin_name'] ?? 'Admin';
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
     </div>
 
     <div class="wrapper">

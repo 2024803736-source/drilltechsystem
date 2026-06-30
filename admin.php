@@ -22,19 +22,16 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - DrillTech Admin</title>
     <style>
-        /* Reset & Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* Lighter grey-tinted background overlay to match client/employee themes */
             background: linear-gradient(rgba(74, 74, 74, 0.45), rgba(15, 15, 15, 0.95)), 
-                        url('images/construction_bg.jpg') center/cover no-repeat fixed;
+                        url('backgroundCSC264.png') center/cover no-repeat fixed;
             color: #f8fafc;
             min-height: 100vh;
         }
 
-        /* ===== HEADER (#4a4a4a grey) ===== */
         .header {
             background: #4a4a4a;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -68,13 +65,26 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             border-radius: 20px;
         }
 
-        /* ===== LAYOUT WRAPPER ===== */
-        .wrapper {
-            display: flex;
-            margin-top: 60px; /* height of header */
+        /* Logout Button */
+        .logout-btn {
+            color: #ff6b6b;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff5252;
         }
 
-        /* ===== SIDEBAR (#5a5a5a grey) ===== */
+        .wrapper {
+            display: flex;
+            margin-top: 60px;
+        }
+
         .sidebar {
             width: 240px;
             background: #5a5a5a;
@@ -99,16 +109,14 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             transition: all 0.2s ease;
         }
         
-        /* Sidebar Hover and Active (#7a7a7a grey) */
         .sidebar a:hover, .sidebar a.active {
             color: #fff;
             background: #7a7a7a;
         }
 
-        /* ===== CONTENT PANEL ===== */
         .content {
             flex: 1;
-            margin-left: 240px; /* sidebar offset */
+            margin-left: 240px;
             padding: 35px 30px;
         }
         
@@ -120,7 +128,6 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             color: #fff;
         }
 
-        /* ===== STAT CARDS FLEX GRID ===== */
         .stats {
             display: flex;
             gap: 20px;
@@ -131,7 +138,7 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
         .stat-card {
             flex: 1;
             min-width: 200px;
-            background: rgba(45, 45, 45, 0.85); /* Semi-transparent modern dark grey background */
+            background: rgba(45, 45, 45, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 24px;
             border-radius: 12px;
@@ -143,7 +150,6 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
         .stat-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-            border-color: rgba(255, 255, 255, 0.25);
         }
 
         .stat-card div:first-child {
@@ -167,7 +173,6 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             font-weight: 500;
         }
 
-        /* ===== RECENT UPDATES CARD ===== */
         .recent-updates {
             background: rgba(45, 45, 45, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -194,16 +199,12 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             padding: 14px 16px;
             margin-bottom: 8px;
             background: rgba(0, 0, 0, 0.2);
-            border-left: 4px solid #ff8c00; /* industrial orange accent line */
+            border-left: 4px solid #ff8c00;
             border-radius: 0 6px 6px 0;
             font-size: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .recent-updates li:last-child {
-            margin-bottom: 0;
         }
 
         .project-name {
@@ -219,7 +220,6 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             text-transform: uppercase;
         }
 
-        /* Status colors */
         .status-pending { background: rgba(255, 204, 0, 0.12); color: #ffcc00; border: 1px solid rgba(255, 204, 0, 0.25); }
         .status-ongoing { background: rgba(0, 204, 102, 0.12); color: #00cc66; border: 1px solid rgba(0, 204, 102, 0.25); }
         .status-completed { background: rgba(51, 153, 255, 0.12); color: #3399ff; border: 1px solid rgba(51, 153, 255, 0.25); }
@@ -227,29 +227,27 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
 </head>
 <body>
 
-    <!-- Header Navigation -->
-<div class="header">
+    <div class="header">
         <div class="logo">
             <img src="images/logo.png" alt="Logo" style="height: 65px; width: auto; display: block; object-fit: contain; filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.65));">
         </div>
-        <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="header-welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></div>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
     </div>
 
-    <!-- Layout Wrapper -->
     <div class="wrapper">
 
-        <!-- Sidebar Navigation -->
         <div class="sidebar">
             <a href="admin.php" class="active">📊 DASHBOARD</a>
             <a href="projectAD.php">📁 PROJECT</a>
             <a href="employeeAD.php">👷 EMPLOYEE</a>
         </div>
 
-        <!-- Content Area -->
         <div class="content">
             <h1 class="welcome">Welcome, <?php echo htmlspecialchars($admin_name); ?></h1>
 
-            <!-- Statistics Grid -->
             <div class="stats">
                 <div class="stat-card">
                     <div>TOTAL PROJECTS</div>
@@ -273,7 +271,6 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
                 </div>
             </div>
 
-            <!-- Recent Projects Activity -->
             <div class="recent-updates">
                 <h3>Recent Updates:</h3>
                 <ul>
@@ -281,7 +278,7 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
                     $recent = mysqli_query($conn, "SELECT Project_Name, Project_Status FROM project ORDER BY Project_ID DESC LIMIT 4");
                     while($row = mysqli_fetch_assoc($recent)):
                         $status = strtolower(trim($row['Project_Status']));
-                        $statusClass = 'status-pending'; // default
+                        $statusClass = 'status-pending';
                         
                         if ($status === 'on going' || $status === 'ongoing' || $status === 'active') {
                             $statusClass = 'status-ongoing';
@@ -304,7 +301,7 @@ $activeClients = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS clie
             </div>
         </div>
 
-    </div><!-- end wrapper -->
+    </div>
 
 </body>
 </html>
