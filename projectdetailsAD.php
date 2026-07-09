@@ -399,11 +399,9 @@ $equipments = mysqli_query($conn, "SELECT * FROM equipment");
                         <?php } ?>
                     </select>
 
-<<<<<<< Updated upstream
                     <label style="color: #ffcc00;">General Worker (Please select at least 5 workers):</label>
-=======
-                    <label>General Worker (choose max 5):</label>
->>>>>>> Stashed changes
+
+
                     <?php 
                     mysqli_data_seek($workers, 0); // Reset pointer
                     while($row = mysqli_fetch_assoc($workers)){ ?>
