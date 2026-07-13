@@ -38,7 +38,7 @@ Built as part of database system development coursework.
 
 ## 📺 System Walkthrough & Live Video Demo
 
-> 🎥 **[CLICK HERE TO WATCH THE 2-MINUTE SYSTEM DEMO](TAMPAL_LINK_GOOGLE_DRIVE_ANDA_DI_SINI)**
+> 🎥 **[CLICK HERE TO WATCH THE 2-MINUTE SYSTEM DEMO](https://drive.google.com/file/d/1V83AJ7U8hGWCDXmpBkX5rY3XUIiI-Mmr/view?usp=sharing)**
 > 
 > *Click the link above to watch the full system execution. This video demonstrates user workflow loops, database resource allocation, and dynamic server-side validation checks in real-time.*
 
@@ -46,7 +46,7 @@ Built as part of database system development coursework.
 
 ## 👩‍💻 My Role & Technical Implementation (STAR Breakdown)
 
-- **Situation:** In complex enterprise resource planning (ERP) solutions like DrillTech, managing isolated access control permissions across distinct corporate entities is a critical security and functional requirement. The platform needed to cater to three highly distinct user personas—System Administrators managing payroll, Commercial Clients requesting new infrastructure projects, and Field Employees tracking their workspace profiles—all operating off a unified relational database architecture.
+- **Situation:** In complex enterprise resource planning (ERP) solutions like DrillTech, managing isolated access control permissions across distinct corporate entities is a critical security and functional requirement. The platform needed to cater to three highly distinct user personas System Administrators managing payroll, Commercial Clients requesting new infrastructure projects and Field Employees tracking their workspace profiles all operating off a unified relational database architecture.
 
 - **Task:** The core engineering challenge was to design a robust, centralized multi-tier login terminal that safely provisions and routes users to their respective, isolated dashboards based on encrypted session tokens. Additionally, the system had to dynamically fetch and cross-reference unique data relationships in real-time (e.g., locking a client to view only their project receipts, and a worker to view only their personal payroll stubs) without causing security leaks or cross-account data exposure.
 
